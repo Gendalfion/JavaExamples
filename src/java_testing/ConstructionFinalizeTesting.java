@@ -40,10 +40,6 @@ public class ConstructionFinalizeTesting {
 		});
 		mTextArea.setComponentPopupMenu(clear_menu);
 		
-		//
-		// TODO Поместите здесь свой код...
-		//
-		
 		((JButton)bottom_panel.add(new JButton("Create object"))).addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
