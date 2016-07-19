@@ -2,11 +2,12 @@ package java_testing;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
+
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -82,10 +83,17 @@ public class ReflectionTesting implements ActionListener {
 	
 	String printMethods (Class<?> someClass, JComboBox<String> cb) {
 		StringBuilder res = new StringBuilder();
-		
 		cb.removeAllItems();
+		
+		// Печатаем все методы класса в строку:
 		for (Method method : someClass.getMethods()) {
-			res.append("\t\"" + method.getName() + "\"\n");
+			res.append("\t\"" + method.getName() + "\"");
+			// Выводим аннотации для метода:
+			if (method.getDeclaredAnnotations().length > 0) { res.append(": "); }
+			for (Annotation annotation : method.getDeclaredAnnotations()) {
+				res.append(annotation.toString() + " ");
+			}
+			res.append("\n");
 			cb.addItem(method.getName());
 		}
 		return res.toString();
@@ -154,6 +162,7 @@ class MyObject {
 	public String Test (Object test) {
 		return "Called MyObject(\"" + mString + "\").Test (" + test + ")";  
 	}
+	@Deprecated
 	public String Test () {
 		return "Called MyObject(\"" + mString + "\").Test (<null>)";  
 	}
