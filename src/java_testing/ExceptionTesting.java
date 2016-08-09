@@ -1,7 +1,6 @@
 package java_testing;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,9 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
-import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
-import org.omg.IOP.ExceptionDetailMessage;
 
 public class ExceptionTesting implements ActionListener {
 	JButton 	mBtnThrow1, mBtnThrow2, mBtnThrow3, mBtnThrow4, mBtnThrow5, mBtnExit; 
