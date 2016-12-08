@@ -5,14 +5,17 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,6 +28,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class ExecutorsTesting {
+
+	Random mRndGenerator = new Random(System.currentTimeMillis());
 	
 	public ExecutorsTesting () {
 		JFrame myFrame = new JFrame ( "Executors Testing" );
@@ -41,6 +46,7 @@ public class ExecutorsTesting {
 		new FixedThreadPoolTesting 		(center_panel);
 		new CachedThreadPoolTesting		(center_panel);
 		new ScheduledThreadPoolTesting	(center_panel);
+		new CompletionServiceTesting	(center_panel);
 		
 		myFrame.add(main_panel);
 		myFrame.setVisible(true);
@@ -91,7 +97,7 @@ public class ExecutorsTesting {
 						public void run() {
 							try {
 								thread_states_tout.append( "+++ Thread Started: " + Thread.currentThread().getName() + "\n\r");
-								Thread.sleep (5000);
+								Thread.sleep (mRndGenerator.nextInt(4500) + 500);
 								thread_states_tout.append( "--- Thread Ended: " + Thread.currentThread().getName() + "\n\r");
 							} catch (InterruptedException e) { }
 						}
@@ -179,7 +185,7 @@ public class ExecutorsTesting {
 			@Override
 			public Integer call() throws Exception {
 				mCalcResultsArea.append("* Start Calculating: " + mParam + " + " + mParam + "\n\r");	mCalcResultsArea.repaint();
-				try { Thread.sleep(5000); } catch (InterruptedException e) { }
+				try { Thread.sleep(mRndGenerator.nextInt(4500) + 500); } catch (InterruptedException e) { }
 				mCalcResultsArea.append("* Calculation done: " + mParam + " + " + mParam + "\n\r");	mCalcResultsArea.repaint();
 				return mParam + mParam;
 			}
@@ -189,8 +195,8 @@ public class ExecutorsTesting {
 	//------------------------------------------------------------------------------------------------------
 	// Класс, демонстрирующий работу планировщика задач ScheduledThreadPool
 	private class ScheduledThreadPoolTesting {
-		ScheduledExecutorService mScheduledExecutor 	= Executors.newSingleThreadScheduledExecutor();
-									//		= Executors.newScheduledThreadPool(int);
+		ScheduledExecutorService mScheduledExecutor 	= Executors.newSingleThreadScheduledExecutor(); // - однопоточный планировщик
+									//		= Executors.newScheduledThreadPool(int); // - для многопоточной реализации планировщика
 		// Создаем пул запланированных задач
 		// Данный пул позволяет выполнять задачи, отложенные на определенный период во времени,
 		// либо выполнять задачи с заданной периодичностью
@@ -216,8 +222,6 @@ public class ExecutorsTesting {
 			tmp_panel.add(mTaskDelayField);
 			tmp_panel.add(new JLabel("seconds"));
 			left_border.add(tmp_panel);
-			
-			left_border.add(Box.createVerticalStrut(10));
 			
 			final JButton set_task_period_btn = new JButton ("Set task period");
 			left_border.add(set_task_period_btn);
@@ -307,7 +311,7 @@ public class ExecutorsTesting {
 			public void run() {
 				mTextArea.append("Delayed task: I\'ve started after " + Integer.toString(mDelay) + " seconds delay\n\r" );	
 				try { 
-					Thread.sleep(3000);
+					Thread.sleep(mRndGenerator.nextInt(3500) + 500);
 					mTextArea.append("Delayed task execution ended...\n\r");
 				} catch (InterruptedException e) {
 					mTextArea.append("Delayed task execution interrupted...\n\r");
@@ -322,13 +326,142 @@ public class ExecutorsTesting {
 			public void run() {
 				mTextArea.append("Periodic task: I\'m working on interval of " + Integer.toString(mTaskPeriod) + " seconds\n\r" );	
 				try { 
-					Thread.sleep(3000);
+					Thread.sleep(mRndGenerator.nextInt(3500) + 500);
 					mTextArea.append("Periodic task execution ended...\n\r");
 				} catch (InterruptedException e) {
 					mTextArea.append("Periodic task execution interrupted...\n\r");
 				}
 				mTextArea.repaint();
 			}
+		}
+	}
+	
+	//------------------------------------------------------------------------------------------------------
+	// Класс, демонстрирующий работу очереди задач CompletionService, которые ожидают своего выполнения
+	private class CompletionServiceTesting {
+		Executor mExecutor = Executors.newSingleThreadExecutor();	// Создаем однопоточный пул потоков
+		CompletionService<String> mCompletionService 				// Создаем очередь на исполнение задач
+			= new ExecutorCompletionService<String>(mExecutor);		// В конструктор передаем наш экземпляр пула потоков mExecutor
+		
+		JTextArea 	mTextArea = new JTextArea();
+		JTextField 	mSubmitMessageField = new JTextField(("Hello message!"), 10);
+		JLabel 		mWaitLabel = new JLabel();
+		
+		public CompletionServiceTesting ( JPanel parent_panel ) {
+			JPanel border_panel = new JPanel(new BorderLayout());
+			parent_panel.add(border_panel);
+			
+			JPanel left_border = new JPanel ();
+			left_border.setLayout(new BoxLayout (left_border, BoxLayout.Y_AXIS));
+			border_panel.add(left_border, BorderLayout.WEST);
+			
+			final JButton submit_btn = new JButton ("Submit");
+			JPanel tmp_panel = new JPanel();
+			tmp_panel.add(mSubmitMessageField);
+			tmp_panel.add(submit_btn);
+			left_border.add(tmp_panel);
+			
+			final JButton take_btn = new JButton ("Take");
+			final JButton poll_btn = new JButton ("Poll");
+			tmp_panel = new JPanel();
+			tmp_panel.add(take_btn);
+			tmp_panel.add(poll_btn);
+			left_border.add(tmp_panel);
+			
+			left_border.add(new JPanel().add(mWaitLabel).getParent());
+			
+			JPanel right_border = new JPanel();
+			border_panel.add(right_border, BorderLayout.CENTER);
+			mTextArea.setEditable(false);
+			border_panel.add(new JScrollPane(mTextArea), BorderLayout.CENTER);
+			
+			JPopupMenu clear_menu = new JPopupMenu();
+			clear_menu.add(new JMenuItem("Clear")).addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					mTextArea.setText("");
+				}
+			});
+			mTextArea.setComponentPopupMenu(clear_menu);
+			
+			
+			submit_btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// Делегируем новую задачу для mExecutor через очередь mCompletionService
+					mCompletionService.submit(new SomeOperation<String>(mSubmitMessageField.getText()));
+				}
+			});
+			
+			poll_btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// Опрашиваем на предмет наличия результата по запущенной операции
+					Future<?> operation_result = mCompletionService.poll();	// - вызов метода .poll() НЕ БЛОКИРУЕТ поток!
+					if ( operation_result != null ) {
+						try {
+							mTextArea.append("Submited operation ended with message: \"" + operation_result.get().toString() + "\"...\n\r");
+						} catch (Exception e) {
+							mTextArea.append("Exception occurred in operation_result.get(): " + e.getMessage() + "\n\r");
+						}
+					} else {
+						mTextArea.append("No operations has ended at the moment...\n\r");
+					}
+				}
+			});
+			
+			new Thread( new Runnable() {
+				@Override
+				public void run() {
+					while ( !Thread.interrupted() )
+					{
+						try {
+							mWaitLabel.setText("IDLE"); mWaitLabel.repaint();
+							synchronized (mWaitLabel) { mWaitLabel.wait(); }	// Ожидаем сообщения на объекте mWaitLabel от внешнего потока
+							mWaitLabel.setText("WAITING..."); mWaitLabel.repaint();
+							
+							// Ожидаем выполнения первой операции из пула потоков и получаем результат ее выполнения
+							Future<?> operation_result = mCompletionService.take(); // - вызов метода .take() БЛОКИРУЕТ поток!
+							if ( operation_result != null ) {
+								mTextArea.append("Operation wait has ended, operation returned: \"" + operation_result.get().toString() + "\"...\n\r");
+							} else {
+								mTextArea.append("Failed to wait for operation completion...\n\r");
+							}
+						} catch ( Exception e ) { 
+							mTextArea.append("Operation wait task exception occurred: " + e.getMessage() + "\n\r");
+						}
+					}
+				}
+			} ).start();
+			take_btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// Используем синхронизацию на объекте mWaitLabel для управления параллельным потоком (который может блокироваться):
+					synchronized (mWaitLabel) { mWaitLabel.notifyAll(); }
+				}
+			});
+		}
+		
+		private class SomeOperation<T> implements Callable<T> {
+			T mParam;
+			
+			public SomeOperation (T param) {
+				mParam = param;
+			}
+			
+			@Override
+			public T call() throws Exception {
+				mTextArea.append("SomeOperation called with parameter \"" + mParam.toString() + "\"\n\r");
+				try { 
+					Thread.sleep(mRndGenerator.nextInt(4500) + 500);
+					mTextArea.append("SomeOperation execution ended...\n\r");
+				} catch (InterruptedException e) {
+					mTextArea.append("SomeOperation execution interrupted...\n\r");
+				}
+				mTextArea.repaint();
+				return mParam;
+			}
+			
 		}
 	}
 }

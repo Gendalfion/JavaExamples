@@ -1,7 +1,5 @@
 package java_testing;
 
-import javax.management.MalformedObjectNameException;
-
 public class ObjectTesting {
 
 	public static void main(String[] args) {

@@ -464,13 +464,12 @@ public class ThreadTesting {
 							BlinkText ("Picked message: " + message, 200);
 							
 							// Вставляем цикл вычислений для перевода потока в состояние RUNNABLE:
-							for (long j = 0; j < 400L; ++j) {
-								synchronized (WaitNotifyTesting.this) { 
+							synchronized (WaitNotifyTesting.this) {
+								for (long j = 0; j < 40L; ++j) {
 									for (long i = 0; i < 50000000L; ++i) { long g = i + j; }
+									Thread.yield(); // Время от времени вызываем явный возврат контроля ОС
 								}
-								Thread.yield(); // Время от времени вызываем явный возврат контроля ОС
 							}
-							
 							Thread.sleep(1000);
 						}
 					}
