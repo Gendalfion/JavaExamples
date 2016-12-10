@@ -27,6 +27,8 @@ class Mandelbrot extends JFrame
 	HashMap<String, Integer> mThreadMap = new HashMap<>() ;
 	
 	public Mandelbrot() {
+		super ("Mandelbrot fractal (Fork-Join Testing)");
+		
 		this.add(mPanel.add(mModeButton).getParent());
 		
 		mModeButton.addActionListener(new ActionListener() {
