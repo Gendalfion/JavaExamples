@@ -1,23 +1,33 @@
 package java_api_testing.java_thread_api;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 
 public class TraditionalSynchronizationTesting {
@@ -35,6 +45,8 @@ public class TraditionalSynchronizationTesting {
 		main_panel.add(center_panel, BorderLayout.CENTER);
 		
 		new CountDownLatchTesting (center_panel);
+		new SemaphoreTesting (center_panel);
+		new CyclicBarrierTesting (center_panel);
 		
 		myFrame.add(main_panel);
 		myFrame.setVisible(true);
@@ -188,6 +200,221 @@ public class TraditionalSynchronizationTesting {
 				} catch ( InterruptedException e ) {
 					mLabel.setText("INTERRUPTED");
 				}
+			}
+		}
+	}
+	
+	// **********************************************************************************************
+	// Класс, демонстрирующий работу класса семафоров в Java: Semaphore
+	private class SemaphoreTesting {
+		// Класс семафора в Java работает подобно блокировке Lock с 2-мя отличиями:
+		// 1. Семафоры в Java являются счетными (т. е. представляют собой произвольное целое число)
+		// 2. У семафора нет фактического владельца (т. е. нет разницы какой поток завладел семафором, а какой будет его отпускать)
+		Semaphore mSemaphore = new Semaphore(0/* Начальное значение счетчика */, true /* "Честность" при блокировке потоков семафором */);
+		
+		int mSemaphoreCounter = 0;
+		JLabel mSemaphoreCounterLabel = new JLabel("Semaphore = 0"); 
+		
+		private void IncSemaphoreCounter () {
+			mSemaphoreCounterLabel.setText("Semaphore = " + Integer.toString(++mSemaphoreCounter));
+		}
+		
+		private void DecSemaphoreCounter () {
+			mSemaphoreCounterLabel.setText("Semaphore = " + Integer.toString(--mSemaphoreCounter));
+		}
+		
+		public SemaphoreTesting ( JPanel parent_panel ) {
+			JPanel border_panel = new JPanel ( new BorderLayout() );
+			border_panel.setBorder(BorderFactory.createTitledBorder("Semaphore Testing"));
+			parent_panel.add(border_panel);
+			
+			JPanel box_panel = new JPanel ();
+			box_panel.setLayout(new BoxLayout(box_panel, BoxLayout.Y_AXIS));
+			border_panel.add(box_panel, BorderLayout.CENTER);
+			
+			JPanel left_panel = new JPanel ();
+			left_panel.setLayout( new BoxLayout(left_panel, BoxLayout.Y_AXIS) );
+			border_panel.add(left_panel, BorderLayout.WEST);
+			
+			JButton release_btn = new JButton("Release Semaphore");
+			left_panel.add( new JPanel ().add(release_btn).getParent() );
+			left_panel.add( new JPanel ().add(mSemaphoreCounterLabel).getParent() );
+			release_btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					mSemaphore.release(); // Отпускаем семафор в потоке обработки контрольных элементов GUI
+					IncSemaphoreCounter ();
+				}
+			});
+			
+			new Thread ( new WaitingThread (box_panel, "Waiting Thread #1") ).start();
+			new Thread ( new WaitingThread (box_panel, "Waiting Thread #2") ).start();
+			new Thread ( new WaitingThread (box_panel, "Waiting Thread #3") ).start();
+			new Thread ( new WaitingThread (box_panel, "Waiting Thread #4") ).start();
+		}
+		
+		private class WaitingThread implements Runnable {
+			JLabel mLabel = new JLabel();
+			
+			public WaitingThread ( JPanel box_panel, String thread_name ) {
+				JPanel tmp_panel = new JPanel();
+				tmp_panel.setBorder ( BorderFactory.createTitledBorder(thread_name) );
+				tmp_panel.add(mLabel);
+				box_panel.add ( tmp_panel );
+			}
+			
+			@Override
+			public void run() {
+				while (!Thread.interrupted())
+				{
+					try {
+						mLabel.setText("Waiting for Semaphore...");
+						
+						Thread.sleep( mRandom.nextInt(2000) + 500 );
+						
+						mSemaphore.acquire(); // Ожидаем пока другой поток не вызовет release()
+						DecSemaphoreCounter ();
+						
+						mLabel.setText("Semaphore Acquired!");
+						Thread.sleep( mRandom.nextInt(3000) + 2000 );
+					} catch ( InterruptedException e ) {
+						mLabel.setText("INTERRUPTED");
+					}
+				}
+			}
+		}
+	}
+	
+	// **********************************************************************************************
+	// Класс, демонстрирующий создание точек циклической синхронизации при помощи класса CyclicBarrier
+	private class CyclicBarrierTesting {
+		JTextArea mLeftArea = new JTextArea("https://translate.google.ru\nhttps://docs.oracle.com\n");
+		JTextArea mRightArea = new JTextArea(0, 30);
+		
+		{
+			mRightArea.setFont(new Font (Font.MONOSPACED, 0, 11));
+		}
+		
+		ExecutorService mPool = null;
+	
+		public CyclicBarrierTesting ( JPanel parent_panel ) {
+			JPanel horizont_box_panel = new JPanel ();
+			horizont_box_panel.setLayout(new BoxLayout(horizont_box_panel, BoxLayout.X_AXIS));
+			horizont_box_panel.setBorder(BorderFactory.createTitledBorder("Cyclic Barrier Testing"));
+			parent_panel.add(horizont_box_panel);
+			
+			JPanel left_panel = new JPanel (new BorderLayout());
+			horizont_box_panel.add(left_panel);
+			left_panel.add(mLeftArea, BorderLayout.CENTER);
+			horizont_box_panel.add(Box.createHorizontalStrut(5));
+			JPanel right_panel = new JPanel(new BorderLayout());
+			right_panel.add(mRightArea, BorderLayout.CENTER);
+			horizont_box_panel.add(right_panel);
+			mRightArea.setEditable(false);
+			
+			JButton update_btn = new JButton("Update URLs");
+			left_panel.add(new JPanel().add(update_btn).getParent(), BorderLayout.SOUTH);
+			
+			startExample ();
+			
+			update_btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					startExample ();
+				}
+			});
+		}
+		
+		private class Result implements Comparable<Result> {
+			Long time;
+			String site;
+			Result( Long time, String site ) { 
+				this.time = new Long (time); 
+				this.site = new String (site);
+			}
+			public int compareTo( Result r ) {
+				if ( r != null ) 
+					return site.compareTo( r.site );
+				return -1; 
+			}
+			
+			public String toString () {
+				if ( time >= 0 ) {
+					return String.format( "%-30.30s : %d", site, time );
+				} else {
+					return String.format( "%-30.30s : Invalid URL", site );
+				}
+			}
+		}
+		
+		private long timeConnect ( String site )
+		{
+			long start = System.currentTimeMillis();
+			try { 
+				new URL( site ).openConnection().connect(); 
+			} catch ( IOException e ) { 
+				return -1;
+			}
+			return System.currentTimeMillis() - start;
+		}
+		
+		private void printList ( List<?> list ) {
+			String str = "";
+			for ( Object elem : list ) {
+				str += elem.toString() + "\n";
+			}
+			mRightArea.setText(str + "------------------");
+			mRightArea.repaint();
+		}
+		
+		public void startExample ()
+		{
+			if ( mPool != null ) {
+				mPool.shutdownNow();
+				mPool = null;
+			}
+			mPool = Executors.newCachedThreadPool();
+		
+			List<Result> results = new ArrayList<>();
+			List<String> urlList = new ArrayList<>();
+			String [] args = mLeftArea.getText().split("[\n\r]"); // Разбиваем строку по символам перевода строки \n или \r
+			for ( String arg : args ) {
+				if ( arg.length() > 1 ) {	// Добавляем в массив URL только не пустые пути:
+					urlList.add(arg);
+				}
+			} 
+			
+			Runnable showResultsAction = new Runnable() { 
+				public void run() { 
+					Collections.sort( results );
+					printList (results);
+					results.clear();
+				} 
+			};
+			
+			// Класс CyclicBarrier позволяет ожидать пока заданное количество потоков не дойдут до единой точки выполнения
+			CyclicBarrier barrier = new CyclicBarrier( 
+					urlList.size(),		// Количество потоков, требующих синхронизации  
+					showResultsAction );// Опционально задается действие, которое будет запущено при достижении точки синхронизации
+					
+			for ( final String site : urlList ) {
+				mPool.execute( new Runnable () {
+					public void run() {
+						while( true ) {
+							long time = timeConnect( site );
+							results.add( new Result( time, site ) );
+							try {
+								barrier.await(); // Задаем точку синхронизации для данного циклического барьера
+								// Как только заданное количество потоков достигнет данного барьера, поток продолжит выполнение,
+								// а барьер вернется в исходное состояние и будет готов для повторного использования
+							} catch ( BrokenBarrierException e ) { 
+								return; 
+							} catch ( InterruptedException e ) { 
+								return; 
+							}
+						}
+					}
+				});
 			}
 		}
 	}
