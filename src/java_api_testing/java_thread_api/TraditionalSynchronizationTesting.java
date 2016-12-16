@@ -15,6 +15,7 @@ import java.util.Vector;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Exchanger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -36,7 +37,7 @@ public class TraditionalSynchronizationTesting {
 	
 	public TraditionalSynchronizationTesting () {
 		JFrame myFrame = new JFrame ( "Traditional Synchronization Testing" );
-		myFrame.setSize(700, 800);
+		myFrame.setSize(700, 1000);
 		myFrame.setLocationRelativeTo(null);
 		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -44,9 +45,10 @@ public class TraditionalSynchronizationTesting {
 		JPanel center_panel = new JPanel(new GridLayout(0, 1));
 		main_panel.add(center_panel, BorderLayout.CENTER);
 		
-		new CountDownLatchTesting (center_panel);
-		new SemaphoreTesting (center_panel);
-		new CyclicBarrierTesting (center_panel);
+		new CountDownLatchTesting 	(center_panel);
+		new SemaphoreTesting 		(center_panel);
+		new CyclicBarrierTesting 	(center_panel);
+		new ExchangerTesting 		(center_panel);
 		
 		myFrame.add(main_panel);
 		myFrame.setVisible(true);
@@ -89,7 +91,6 @@ public class TraditionalSynchronizationTesting {
 			
 			mWorkersList.add( new WorkingThread (box_panel, "First Working Thread") );
 			mWorkersList.add( new WorkingThread (box_panel, "Second Working Thread") );
-			mWorkersList.add( new WorkingThread (box_panel, "Third Working Thread") );
 			
 			mWaitingList.add( new WaitingThread (box_panel, "First Waiting Thread") );
 			mWaitingList.add( new WaitingThread (box_panel, "Second Waiting Thread") );
@@ -250,7 +251,6 @@ public class TraditionalSynchronizationTesting {
 			new Thread ( new WaitingThread (box_panel, "Waiting Thread #1") ).start();
 			new Thread ( new WaitingThread (box_panel, "Waiting Thread #2") ).start();
 			new Thread ( new WaitingThread (box_panel, "Waiting Thread #3") ).start();
-			new Thread ( new WaitingThread (box_panel, "Waiting Thread #4") ).start();
 		}
 		
 		private class WaitingThread implements Runnable {
@@ -298,10 +298,13 @@ public class TraditionalSynchronizationTesting {
 		ExecutorService mPool = null;
 	
 		public CyclicBarrierTesting ( JPanel parent_panel ) {
+			JPanel border_panel = new JPanel( new BorderLayout() );
+			border_panel.setBorder(BorderFactory.createTitledBorder("Cyclic Barrier Testing"));
+			parent_panel.add(border_panel);
+			
 			JPanel horizont_box_panel = new JPanel ();
 			horizont_box_panel.setLayout(new BoxLayout(horizont_box_panel, BoxLayout.X_AXIS));
-			horizont_box_panel.setBorder(BorderFactory.createTitledBorder("Cyclic Barrier Testing"));
-			parent_panel.add(horizont_box_panel);
+			border_panel.add(horizont_box_panel, BorderLayout.CENTER);
 			
 			JPanel left_panel = new JPanel (new BorderLayout());
 			horizont_box_panel.add(left_panel);
@@ -310,10 +313,9 @@ public class TraditionalSynchronizationTesting {
 			JPanel right_panel = new JPanel(new BorderLayout());
 			right_panel.add(mRightArea, BorderLayout.CENTER);
 			horizont_box_panel.add(right_panel);
-			mRightArea.setEditable(false);
 			
 			JButton update_btn = new JButton("Update URLs");
-			left_panel.add(new JPanel().add(update_btn).getParent(), BorderLayout.SOUTH);
+			border_panel.add(new JPanel().add(update_btn).getParent(), BorderLayout.SOUTH);
 			
 			startExample ();
 			
@@ -416,6 +418,81 @@ public class TraditionalSynchronizationTesting {
 					}
 				});
 			}
+		}
+	}
+	
+	// **********************************************************************************************
+	// Класс, демонстрирующий использование класса синхронизации Exchanger
+	private class ExchangerTesting {
+		JTextArea mLeftArea 	= new JTextArea("Frist Buffer");
+		JTextArea mRightArea 	= new JTextArea("Second Buffer");
+		
+		// Класс Exchanger позволяет синхронизировать пару потоков для обмена данными
+		// Данный класс отличается от SynchronousQueue тем, что передает данные в двух направлениях
+		Exchanger<StringBuffer> mExchanger = new Exchanger<>();
+		
+		public ExchangerTesting ( JPanel parent_panel ) {
+			JPanel border_panel = new JPanel( new BorderLayout() );
+			border_panel.setBorder(BorderFactory.createTitledBorder("Exchanger Testing"));
+			parent_panel.add(border_panel);
+			
+			JPanel horizont_box_panel = new JPanel ();
+			horizont_box_panel.setLayout(new BoxLayout(horizont_box_panel, BoxLayout.X_AXIS));
+			border_panel.add(horizont_box_panel, BorderLayout.CENTER);
+			
+			JPanel left_panel = new JPanel (new BorderLayout());
+			horizont_box_panel.add(left_panel);
+			left_panel.add(mLeftArea, BorderLayout.CENTER);
+			horizont_box_panel.add(Box.createHorizontalStrut(5));
+			JPanel right_panel = new JPanel(new BorderLayout());
+			right_panel.add(mRightArea, BorderLayout.CENTER);
+			horizont_box_panel.add(right_panel);
+			
+			JButton exchange_btn = new JButton("Exhange Buffers");
+			border_panel.add(new JPanel().add(exchange_btn).getParent(), BorderLayout.SOUTH);
+			
+			new Thread() {	// Поток №1
+				public void run() {
+					StringBuffer buffer1 = new StringBuffer(mLeftArea.getText());
+					
+					while (!Thread.interrupted()) {
+						try {
+							synchronized (exchange_btn) { exchange_btn.wait(); }	// Ждем нажатия пользовательской кнопки
+							
+							// Заполняем буфер данными
+							buffer1.setLength(0);
+							buffer1.append(mLeftArea.getText());
+							
+							// Обмениваемся буфером с другим потоком
+							buffer1 = mExchanger.exchange(buffer1);
+							
+							mLeftArea.setText(buffer1.toString()); mLeftArea.repaint();
+						} catch ( InterruptedException e ) {}
+					}	
+				}
+			}.start();
+			
+			new Thread() {	// Поток №2
+				public void run() {
+					StringBuffer buffer2 = new StringBuffer(mRightArea.getText());
+					
+					while (!Thread.interrupted()) {
+						try {
+							// Данный поток блокируется пока какой либо другой поток не захочет обменяться данными на объекте mExchanger
+							buffer2 = mExchanger.exchange(buffer2);
+							
+							mRightArea.setText(buffer2.toString()); mRightArea.repaint();
+						} catch ( InterruptedException e ) {}
+					}	
+				}
+			}.start();
+			
+			exchange_btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					synchronized (exchange_btn) { exchange_btn.notifyAll(); }
+				}
+			});
 		}
 	}
 
