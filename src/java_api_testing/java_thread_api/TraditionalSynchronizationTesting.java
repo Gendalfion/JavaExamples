@@ -37,7 +37,7 @@ public class TraditionalSynchronizationTesting {
 	
 	public TraditionalSynchronizationTesting () {
 		JFrame myFrame = new JFrame ( "Traditional Synchronization Testing" );
-		myFrame.setSize(700, 1000);
+		myFrame.setSize(700, 850);
 		myFrame.setLocationRelativeTo(null);
 		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -398,6 +398,9 @@ public class TraditionalSynchronizationTesting {
 			CyclicBarrier barrier = new CyclicBarrier( 
 					urlList.size(),		//  оличество потоков, требующих синхронизации  
 					showResultsAction );// ќпционально задаетс€ действие, которое будет запущено при достижении точки синхронизации
+			// !! ѕримечание: более гибким классом, похожим по назначению на CyclicBarrier, €вл€етс€ класс Phaser,
+			// позвол€ющий отслеживать количество итераций в точке синхронизации (номер фазы), а также
+			// динамически измен€ть количество потоков приход€щих к барьеру
 					
 			for ( final String site : urlList ) {
 				mPool.execute( new Runnable () {
