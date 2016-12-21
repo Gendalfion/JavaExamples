@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -50,6 +52,9 @@ public class LocalizationTesting {
 	TitledBorder mRightBorder = BorderFactory.createTitledBorder("Current locale: ");
 	
 	{
+		// Устанавливаем локаль по-умолчанию:
+		Locale.setDefault(Locale.US/*English (United States)*/);
+		
 		// Создаем отсортированный по названию массив локалей, доступных на данном компьютере:
 		for ( Locale elem : Locale.getAvailableLocales() ) {
 			mLocaleArraySorted.add(new MyLocale(elem));
@@ -143,10 +148,27 @@ public class LocalizationTesting {
 		Date currentDate = new Date();
 		fmt.format(locale, fmt_template, "DateFormat(Short)", DateFormat.getDateInstance(DateFormat.SHORT, locale).format(currentDate));
 		fmt.format(locale, fmt_template, "DateFormat(Long)", DateFormat.getDateInstance(DateFormat.LONG, locale).format(currentDate));
+		fmt.format("\n");
+		
+		// Демонстрация работы с объектом ResourceBundle - хэш-таблицей, позволяющей переводить текстовые сообщения на разные языки:
+		try
+		{
+			// Получаем объект ResourceBundle из фабрики по имени ресурса (указывается полное имя класса) и текущей выбранной локали
+			// Ресурсы автоматически набираются либо из наследников класса ListResourceBundle (см. MyResourceBundle) 
+			// либо из property-файлов, находящихся в директории исполняемого класса (в нашем случае: \bin\java_api_testing\java_text_api\)
+			// файлы должны иметь название MyResourceBundle{_<language>_<country>}.properties и содержать строки вида:
+			// <ключ>=<значение>
+			ResourceBundle bundle = ResourceBundle.getBundle("java_api_testing.java_text_api.MyResourceBundle", locale);
+			// Получаем значения ресурсов по имени ключа:
+			fmt.format(fmt_template, "bundle.getString(\"HelloMessage\")", bundle.getString("HelloMessage"));
+			fmt.format(fmt_template, "bundle.getString(\"ByeMessage\")", bundle.getString("ByeMessage"));
+			fmt.format(fmt_template, "bundle.getString(\"SomeMessage\")", bundle.getString("SomeMessage"));
+		} catch ( MissingResourceException e /* Если ресурс не будет найден, то будет сгенерировано данное исключение */) {
+			fmt.format(fmt_template, "ResourceBundle Exception", e.getMessage());
+		}
 		
 		mRightArea.setText(fmt.toString());
 		mRightBorder.setTitle("Current Locale: " + locale.getDisplayName());
 		fmt.close();
 	}
-
 }
