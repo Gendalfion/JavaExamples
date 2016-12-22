@@ -18,7 +18,8 @@ public class MyResourceBundle extends ListResourceBundle {
 	
 	private final static String [][] MY_BUNDLE_CONTENT_DEFAULT = {
 			{"HelloMessage", "Hello in English!"},
-			{"ByeMessage", "Goodbye in English..."}
+			{"ByeMessage", "Goodbye in English..."},
+			{"SomeMessage", "This is SomeMessage value..."}
 	};
 
 	// Обязательным является переопределение абстрактного метода getContents(), который должен возвращать
