@@ -4,11 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.Formatter;
+import java.util.IllegalFormatException;
 import java.util.InputMismatchException;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.UnknownFormatConversionException;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
@@ -25,7 +25,7 @@ import javax.swing.event.DocumentListener;
 public class TextParseAndFormatTesting {
 	
 	public TextParseAndFormatTesting () {
-		JFrame myFrame = new JFrame ( "Text Parsing Testing" );
+		JFrame myFrame = new JFrame ( "Text Parsing and Formatting Testing" );
 		myFrame.setSize(1200, 800);
 		myFrame.setLocationRelativeTo(null);
 		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -116,13 +116,14 @@ public class TextParseAndFormatTesting {
 	//  ласс, демонстрирующий примеры работы с printf-style форматированием текста
 	private class FormatTesting {
 		
-		/* Ўаблон форматировани€ следующий:
+		/* Ўаблон форматировани€ printf следующий:
 		 * %[индекс_аргумента$][флаги][ширина(мин. кол-во символов)][.точность(макс. кол-во символов)]тип 
 		 */
 		
 		JTextField mTextField = new JTextField("Text to Format", 25);
 		JTextField mTextFormatField = new JTextField("(%1$-20.20S)   (%1$20.20s)", 25);
 		JTextField mIntegerField = new JTextField("2047", 25);
+		JTextField mFloatFiled = new JTextField("235.0123456789", 25);
 		
 		JTextArea mFormattedTextArea = new JTextArea();
 		
@@ -144,6 +145,9 @@ public class TextParseAndFormatTesting {
 			left_panel.add(new JLabel("Input Integer Number:"));
 			left_panel.add(new JPanel().add(mIntegerField).getParent());
 			
+			left_panel.add(new JLabel("Input Float Number:"));
+			left_panel.add(new JPanel().add(mFloatFiled).getParent());
+			
 			mFormattedTextArea.setBorder(BorderFactory.createTitledBorder("Formatted Text:"));
 			mFormattedTextArea.setEditable(false);
 			mFormattedTextArea.setFont(new Font (Font.MONOSPACED, 0, 12));
@@ -159,6 +163,7 @@ public class TextParseAndFormatTesting {
 			mTextField.getDocument().addDocumentListener(my_documet_listener);
 			mTextFormatField.getDocument().addDocumentListener(my_documet_listener);
 			mIntegerField.getDocument().addDocumentListener(my_documet_listener);
+			mFloatFiled.getDocument().addDocumentListener(my_documet_listener);
 		}
 		
 		public void FormatText () {
@@ -171,13 +176,19 @@ public class TextParseAndFormatTesting {
 				fmt.format("\""); fmt.format(mTextFormatField.getText(), mTextField.getText()); fmt.format("\"\n\n");
 				
 				// ѕример форматировани€ логического типа:
-				fmt.format("Text length is greater then 15: %1$b(%1$B)\n\n", mTextField.getText().length() > 15);
+				fmt.format("Text length is greater then 15: %1$b(%%1$b), %1$B(%%1$B)\n\n", mTextField.getText().length() > 15);
 				
 				// ѕример форматировани€ целого числа:
 				fmt.format("Format integer number example:\n");
-				fmt.format("\"%1$d\"(%%1$d), \"%1$x\"(%%1$x), \"%1$X\"(%%1$X), \"%1$h\"(%%1$h), \"%1$H\"(%%1$H)\n\n", Integer.valueOf(mIntegerField.getText()).intValue() );
-			} catch ( UnknownFormatConversionException e ) { // √енерируетс€, если задан некорректный шаблон форматировани€
-				fmt.format(fmt_template, "UnknownFormatConversionException", e.getMessage() );
+				fmt.format("\"%1$d\"(%%1$d), \"%1$x\"(%%1$x), \"%1$#X\"(%%1$#X), \"%1$h\"(%%1$h), \"%1$H\"(%%1$H), \"%1$(06d\"(%%1$(06d), \"%1$ ,d\"(%%1$ ,+d)\n\n"
+						, Integer.valueOf(mIntegerField.getText()).intValue() );
+				
+				// ѕример форматировани€ вещественного числа:
+				fmt.format("Format float number example:\n");
+				fmt.format("\"%1$f\"(%%1$f), \"%1$.3e\"(%%1$.3e), \"%1$.1E\"(%%1$.1E), \"%1$.6g\"(%%1$.6g), \"%1$G\"(%%1$G), \"%1$.4a\"(%%1$a)\n\n"
+						, Double.valueOf(mFloatFiled.getText()).doubleValue());
+			} catch ( IllegalFormatException e ) { // √енерируетс€, если задан некорректный шаблон форматировани€
+				fmt.format(fmt_template, "IllegalFormatException", e.getMessage() );
 			} catch ( NumberFormatException e ) { // .valueOf() exception
 				fmt.format(fmt_template, "NumberFormatException", e.getMessage() );
 			}

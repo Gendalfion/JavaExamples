@@ -42,7 +42,6 @@ public class LocalizationTesting {
 		public int compareTo(MyLocale o) {
 			return this.toString().compareTo(o.toString());
 		}
-		
 	}
 	
 	JList<MyLocale> mLocaleList = new JList<>();
