@@ -72,7 +72,7 @@ public class TextParseAndFormatTesting {
 			mParsedTextArea.setFont(new Font (Font.MONOSPACED, 0, 12));
 			border_panel.add(new JScrollPane(mParsedTextArea), BorderLayout.CENTER);
 			
-			DocumentListener my_documet_listener = new DocumentListener() {
+			DocumentListener my_document_listener_listener = new DocumentListener() {
 				@Override public void removeUpdate(DocumentEvent e)  { OnChange (); }
 				@Override public void insertUpdate(DocumentEvent e)  { OnChange (); }
 				@Override public void changedUpdate(DocumentEvent e) { OnChange (); }
@@ -80,8 +80,8 @@ public class TextParseAndFormatTesting {
 			};
 			
 			ParseText (mInputField.getText(), mRegExpField.getText());
-			mInputField.getDocument().addDocumentListener(my_documet_listener);
-			mRegExpField.getDocument().addDocumentListener(my_documet_listener);
+			mInputField.getDocument().addDocumentListener(my_document_listener_listener);
+			mRegExpField.getDocument().addDocumentListener(my_document_listener_listener);
 		}
 		
 		public void ParseText ( String text, String delimeter_expression_pattern ) {
