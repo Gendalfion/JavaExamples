@@ -12,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -32,12 +33,40 @@ import javax.swing.text.StyleContext;
 public class RegexpTesting implements DocumentListener, ListSelectionListener {
 	// Примеры регулярных выражений для выделения паттернов в тексте:
 	static final String [] mSearchRegexpArray = {
-		"example"
+		  "example"				// Простой шаблон, совпадающий со входным текстом символ в символ
+		, ".xample."			// Специальный символ '.' соответствует любому единичному символу
+		, "\\sexample\\S"		// '\s' = {' ', '\t', '\r', '\n', '\f'}; '\S' = все, кроме символов '\s'
+		, "\\d\\D"				// '\d' = ['0'..'9'], '\D\ = все, кроме символов '\D'
+		, "\\w\\W"				// 'w' = {['0'..'9'], ['a'..'z'], ['A'..'Z'], '_'}, 'W' = все, кроме символов '\w'
+		, "[A-Za-z&&[^b-zST]]" // [] - используется для построения групп из произвольных символов, && - пересечение множеств групп
+								// '^' - все символы, кроме символов из множества
+		, "^[Tt]his"			// Специальный символ '^' в начале выражения соответствует началу ввода (строки в многострочном режиме)
+		, "(?m)[Tt]his$"		// Специальный символ '$' в конце выражения соответствует концу ввода (концу строки в многострочном режиме)
+								// (?m) в начале выражения включает многострочный режим
+		, "(?i)this"			// (?i) в начале выражения включает режимнечуствительности к регистру
+		, "\\d*0"				// Специальный символ '*' означает любое количество повторений предшествующего символа (0 или более)
+		, "\\d+0"				// Специальный символ '+' означает повторение предшествующего символа (1 или более раз)
+		, "\\bexamples?\\b"		// '\b' - метка границы слова, '?' - 0 или 1 повторение предшествующего символа
+		, "\\b\\w{2,4}\\b"		// {x,y} - повторение предшествующего символа от x до y раз,
+								// если y не указано, подразумевается y = бесконечности
+		, "\\w+@\\w+(\\.\\w+)+"	// () - группирование в шаблоне позволяет применять символы множественности к целому выражению в скобках
+		, "\\b(\\w)\\w*\\1\\b"	// \n, где n = [1, 2, ...] - захват группы, позволяющий использовать ранее захваченный текст
+								// по номеру группы (номер группы определяется по количетву открытых скобок и начинается с 1)
+		, "\\w+@(\\w+\\.)+(net|org|ru)"	// Символ '|' означает логическое или при выборке 
+		, "</?.*?>"				// '?' после сивола повторения означает "нежадную" выборку символов (выборка как можно
+								// меньшего количества символов перед наступлением условия окончания поиска)
+		, "(?=\\w+\\W)is"		// (?=) - операция просмотра вперед требует наличия определенного шаблона далее по тексту
+								// (но не вбирает его в качестве совпадения)
+		, "(?![Ee]xample)ex"	// '!' - просмотр вперед паттернов, не совпадающих с выражением в скобках
+		, "(?<=[Ee]xample )text"// (?<=) - операция просмотра назад требует наличия определенного шаблона перед заданным паттерном
+		
 	};
 	
 	// Примеры регулярных выражений для замены выделенных паттернов в тексте:
 	static final String [] mReplaceRegexpArray = {
-		"simple"
+			"simple"			// Простой текст, который заменит все найденные паттерны во входном тексте
+		,	"Group-\"$1\""		// $n - ссылка на группу в паттерне входного текста, n = [1, 2, ...]
+		,	"Pattern-\"$0\""	// $0 - ссылка на весь паттерн из входного текста
 	};
 	
 	JTextField mSearchRegexpField = new JTextField(25);
@@ -103,7 +132,7 @@ public class RegexpTesting implements DocumentListener, ListSelectionListener {
 		JPanel left_top_panel = new JPanel (new BorderLayout());
 		left_panel.add(left_top_panel);
 		mSearchRegexpList.setBorder(BorderFactory.createTitledBorder("Search Expression Examples:"));
-		left_top_panel.add(mSearchRegexpList, BorderLayout.CENTER);
+		left_top_panel.add(new JScrollPane(mSearchRegexpList), BorderLayout.CENTER);
 		mSearchRegexpList.addListSelectionListener(this);
 		
 		tmp_panel = new JPanel(); tmp_panel.setBorder(BorderFactory.createTitledBorder("Enter Your Search Expression:"));
@@ -126,7 +155,12 @@ public class RegexpTesting implements DocumentListener, ListSelectionListener {
 		main_panel.add(center_panel, BorderLayout.CENTER);
 		
 		mInputPane.setBorder(BorderFactory.createTitledBorder("Input Text:"));
-		mInputPane.setText("This is example text (Example text)\n");
+		mInputPane.setText("This is example text (Example text)\n"
+					+ "Second line of text examples\n"
+					+ "this end of line (This is here) this\n"
+					+ "01234567890 1234567890_,0\n"
+					+ "foo@mail.com friend__@foo.mail.org invalid@.ru vaild@ua.ru\n"
+					+ "<teg> Example text inside teg </teg>");
 		center_panel.add(mInputPane);
 		mInputPane.getDocument().addDocumentListener(this);
 		mInputPane.setToolTipText("found pattern occurrences are highlighted");
@@ -152,9 +186,7 @@ public class RegexpTesting implements DocumentListener, ListSelectionListener {
 			// Получаем текстовое представление регулярного выражения для поиска шаблона в тексте:
 			if ( !mSearchRegexpField.getText().isEmpty() ) {
 				exp_search_pattern = mSearchRegexpField.getText();
-				mSearchRegexpList.setEnabled(false);
 			} else {
-				mSearchRegexpList.setEnabled(true);
 				if ( mSearchRegexpList.getSelectedIndex() >= 0 ) {
 					exp_search_pattern = mSearchRegexpList.getSelectedValue();
 				}
@@ -163,9 +195,7 @@ public class RegexpTesting implements DocumentListener, ListSelectionListener {
 			// Получаем текстовое представление регулярного выражения для замены шаблона в тексте:
 			if ( !mReplaceRegexpField.getText().isEmpty() ) {
 				exp_replace_pattern = mReplaceRegexpField.getText();
-				mReplaceRegexpList.setEnabled(false);
 			} else {
-				mReplaceRegexpList.setEnabled(true);
 				if ( mReplaceRegexpList.getSelectedIndex() >= 0 ) {
 					exp_replace_pattern = mReplaceRegexpList.getSelectedValue();
 				}
@@ -209,7 +239,7 @@ public class RegexpTesting implements DocumentListener, ListSelectionListener {
 		StringBuffer out_buffer = new StringBuffer();
 		int output_buff_offset = 0;
 		while (matcher.find()) {	// метод .find() используется для перехода между совпадениями шаблона в тексте
-			// Записываем найденные совпадения во входном тексте:
+			// Запоминаем найденные совпадения во входном тексте:
 			change_buf.mInputTextSelection.add(new TextSelection(
 					matcher.start(), 			// Индекс первого символа совпавшего шаблона во входном тексте
 					matcher.group().length())); // Метод .group() возвращает подстроку из текста, совпавшую с шаблоном
@@ -239,7 +269,14 @@ public class RegexpTesting implements DocumentListener, ListSelectionListener {
 	@Override public void removeUpdate(DocumentEvent e)  	{ updateAll (); }
 	@Override public void insertUpdate(DocumentEvent e)  	{ updateAll (); }
 	@Override public void changedUpdate(DocumentEvent e) 	{ /*updateAll ();*/ }
-	@Override public void valueChanged(ListSelectionEvent e){ updateAll (); }
+	@Override public void valueChanged(ListSelectionEvent e){
+		if (e.getSource() == mSearchRegexpList) {
+			mSearchRegexpField.setText( mSearchRegexpList.getSelectedValue() );
+		}
+		if (e.getSource() == mReplaceRegexpList) {
+			mReplaceRegexpField.setText( mReplaceRegexpList.getSelectedValue() );
+		}
+	}
 
 	public static void main(String[] args) {
 		new RegexpTesting ();
