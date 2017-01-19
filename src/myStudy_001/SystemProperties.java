@@ -1,7 +1,6 @@
 package myStudy_001;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -9,16 +8,13 @@ import java.awt.event.ItemListener;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.Formatter;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -26,8 +22,6 @@ import javax.swing.JTextArea;
 public class SystemProperties {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
 		JFrame myFrame = new JFrame ( "Property test" );
 		
 		myFrame.setSize(700, 800);
@@ -46,6 +40,7 @@ public class SystemProperties {
 		{
 			fmt.format("%03d: %25s = \"%s\"\r\n", ++i, keys.nextElement().toString(), vals.nextElement().toString());
 		}
+		fmt.close();
 		
 		JComboBox<Object> cbKeys = new JComboBox<>( System.getProperties().stringPropertyNames().toArray() );
 		cbKeys.setEditable(true);
