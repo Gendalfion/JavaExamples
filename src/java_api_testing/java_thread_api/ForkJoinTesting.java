@@ -22,6 +22,7 @@ public class ForkJoinTesting {
 
 class Mandelbrot extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	JPanel mPanel = new JPanel();
 	JToggleButton mModeButton = new JToggleButton("Thread Indication");
 	HashMap<String, Integer> mThreadMap = new HashMap<>() ;
@@ -55,7 +56,8 @@ class Mandelbrot extends JFrame
     
     private class MandelbrotTask extends RecursiveAction	// RecursiveAction - тип рекурсивной задачи, не возвращающей значения
     {
-        private final double size = 3.0, offsetX = -0.7, thresholdSq = 100;
+        private static final long serialVersionUID = 1L;
+		private final double size = 3.0, offsetX = -0.7, thresholdSq = 100;
         private final int maxIterations = 30;
         private BufferedImage image;
         private int xStart, xEnd, yStart, yEnd;
