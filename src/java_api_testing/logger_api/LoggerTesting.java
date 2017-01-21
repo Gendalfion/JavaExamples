@@ -31,6 +31,7 @@ public class LoggerTesting {
 	
 	// Настройки журнала по-умолчанию хранятся в файле <java_install_path>/jre/lib/logging.properties
 	// Задать собственный файл настроек можно при помощи системной опции: -Djava.util.logging.config.file=<myfile.properties>
+	// Пример для LoggerTesting: -Djava.util.logging.config.file=".\src\java_api_testing\logger_api\my_logger.properties"
 	
 	public LoggerTesting () {
 		JFrame myFrame = new JFrame ( "java.util.logging.Logger Testing" );
