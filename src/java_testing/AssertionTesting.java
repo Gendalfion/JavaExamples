@@ -13,8 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import java_testing.ExceptionTesting.eExceptionChoice;
-
 public class AssertionTesting implements ActionListener{
 	JButton mBtnAssert1;
 	JTextArea	mTextArea;
@@ -42,7 +40,6 @@ public class AssertionTesting implements ActionListener{
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		new AssertionTesting();
 	}
 	

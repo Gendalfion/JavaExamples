@@ -65,7 +65,7 @@ public class LoggerTesting {
 					mMyLogger.severe(log_message_field.getText());
 				}
 			}
-		});
+		}); 
 		
 		JButton warning_msg_btn = new JButton("warning(message)");
 		tmp_panel.add(warning_msg_btn);
@@ -161,7 +161,7 @@ public class LoggerTesting {
 		main_panel.add(bottom_panel, BorderLayout.SOUTH);
 		
 		JComboBox<Level> choose_level_box = new JComboBox<> (
-				new Level[] { Level.SEVERE, Level.WARNING, Level.CONFIG, Level.INFO, Level.FINE, Level.FINER, Level.FINEST } );
+				new Level[] { Level.SEVERE, Level.WARNING, Level.INFO, Level.CONFIG, Level.FINE, Level.FINER, Level.FINEST } );
 		bottom_panel.add(new JLabel("Choose log level for log handler:  "));
 		bottom_panel.add(choose_level_box);
 		my_handler.setLevel(Level.CONFIG);
