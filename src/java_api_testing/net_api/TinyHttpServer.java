@@ -11,6 +11,8 @@ import java.util.concurrent.*;
  * 
  * Данный код написан на основе примера из книги:
  * Патрик Нимейер, Дэниэл Леук - Программирование на Java. Исчерпывающее руководство для профессионалов. (4-е издание)
+ * 
+ * Доработан для поддержки современного стандарта HTTP 1.1
  */
 public class TinyHttpServer {
 	public static void main( String args[] ) throws IOException {
@@ -79,19 +81,23 @@ class TinyHttpdConnection implements Runnable {
 					request = "/" + request;
 				}
 				System.out.println( String.format("Requested resource: \"%s\"", request) );
-				try ( InputStream is = TinyHttpServer.class.getResourceAsStream(request) ) {
-					if ( is != null ) {
+				try ( InputStream inStream = TinyHttpServer.class.getResourceAsStream(request) ) {
+					if ( inStream != null ) {
+						out.write( "HTTP/1.1 200 OK\r\n\r\n".getBytes("8859_1") );
 						byte [] data = new byte [ 64*1024 ];
-						for(int read; (read = is.read( data )) > -1; ) {
+						for(int read; (read = inStream.read( data )) > -1; ) {
 							out.write( data, 0, read );
 						}
 						out.flush();
+						System.out.println( String.format("Resource \"%s\" is sent...", request) );
 					} else {
 						pout.println( "404 Object Not Found" );
+						System.err.println( String.format("Resource \"%s\" not found!", request) );
 					}
 				}
 			} else {
 				pout.println( "400 Bad Request" );
+				System.err.println( String.format("Bad request: \"%s\"!", request) );
 			}
 		} catch ( IOException e ) {
 			System.out.println( "I/O error " + e ); 
