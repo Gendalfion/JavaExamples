@@ -12,7 +12,7 @@ import java.util.concurrent.*;
  * Данный код написан на основе примера из книги:
  * Патрик Нимейер, Дэниэл Леук - Программирование на Java. Исчерпывающее руководство для профессионалов. (4-е издание)
  * 
- * Доработан для поддержки современного стандарта HTTP 1.1
+ * Доработан для поддержки стандарта HTTP 1.1
  */
 public class TinyHttpServer {
 	public static void main( String args[] ) throws IOException {
@@ -106,5 +106,5 @@ class TinyHttpdConnection implements Runnable {
 			
 			System.out.println( String.format("%1$tT.%1$tL http connection closed...", new java.util.Date()) );
 		}
-  }
+	}
 }
