@@ -7,8 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +90,12 @@ public class HttpGET_Testing {
 				try {
 					// Формируем URL для HTTP-запроса
 					// (параметры запроса передаются после символа ? и разделяются &):
-					java.net.URL url = new java.net.URL ( 
-							String.format("http://www.google.com/search?q=%s", searchField.getText().replaceAll("\\s+", "+")) );
+					java.net.URL url = new java.net.URL (
+							// Для того, чтобы сервер смог декодировать наш запрос, используем
+							// статический метод URLEncoder.encode(...), который кодирует заданный текст
+							// в соответствии с правилами кодирования в стандарте URL:
+							String.format("http://www.google.com/search?q=%s", URLEncoder.encode(searchField.getText(), "UTF-8"/*кодировка сервера Google*/)) 
+							);
 					
 					responseInfoArea.setText(""); responseInfoArea.repaint();
 					url_content_panel.removeAll(); url_content_panel.repaint();
@@ -163,7 +169,7 @@ public class HttpGET_Testing {
 							}
 						}
 					} ).start();
-				} catch (MalformedURLException exception) {
+				} catch (MalformedURLException | UnsupportedEncodingException exception) {
 					JOptionPane.showMessageDialog(main_panel, "Failed to form URL: " + exception, "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
