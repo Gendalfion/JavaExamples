@@ -1,0 +1,1 @@
+start java -cp ..\..\.\bin java_api_testing.net_api.SocketTesting_Server 10000

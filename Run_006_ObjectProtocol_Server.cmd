@@ -1,1 +1,0 @@
-start java -cp .\bin java_api_testing.net_api.obj_prot_testing.ObjectProtocol_Server 10000

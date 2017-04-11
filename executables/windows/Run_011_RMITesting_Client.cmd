@@ -1,0 +1,1 @@
+start javaw -cp ..\..\.\bin java_api_testing.rmi.client.RMIClientTesting

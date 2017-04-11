@@ -1,0 +1,1 @@
+start java -cp ..\..\.\bin myStudy_001.HelloWorld "Привет из аргументов командной строки!"
