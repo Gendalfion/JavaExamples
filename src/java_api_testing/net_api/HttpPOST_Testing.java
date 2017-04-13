@@ -79,13 +79,13 @@ public class HttpPOST_Testing {
 		
 		constraints.gridx = 0; constraints.gridy = 0;
 		form_panel.add(new JLabel("First Name:", JLabel.TRAILING), constraints);
-		JTextField firstNameField = new JTextField("Alexandr", 20);
+		JTextField firstNameField = new JTextField("Александр", 20);
 		constraints.gridx = 1; constraints.gridy = 0;
 		form_panel.add(firstNameField, constraints);
 		
 		constraints.gridx = 0; constraints.gridy = 1;
 		form_panel.add(new JLabel("Last Name:", JLabel.TRAILING), constraints);
-		JTextField lastNameField = new JTextField("Pushkin", 20);
+		JTextField lastNameField = new JTextField("Пушкин", 20);
 		constraints.gridx = 1; constraints.gridy = 1;
 		form_panel.add(lastNameField, constraints);
 		
@@ -137,6 +137,8 @@ public class HttpPOST_Testing {
 							// (т. к. мы точно знаем тип протокола в нашем URL-запросе):
 							HttpURLConnection httpConnection  = (HttpURLConnection)url.openConnection();
 							
+							String charset = "UTF-8";
+							
 							// Устанавливаем тип POST для HTTP-запроса.
 							// Запрос POST отличается от GET-запроса тем, что мы можем отправить на сервер
 							// произвольные данные в теле HTTP пакета:
@@ -148,28 +150,28 @@ public class HttpPOST_Testing {
 							// Устанавливаем свойство "Content-type" в значение "application/x-www-form-urlencoded"
 							// для того, чтобы сервер понял, что мы отправляем данные формы (список пар ключ-значение,
 							// которые отражают данные, введенные пользователем в некоторую форму):
-							httpConnection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+							httpConnection.setRequestProperty("Content-type", "application/x-www-form-urlencoded; charset=" + charset);
+							
 							
 							// Метод HttpURLConnection.setDoOutput(...) настраивает HTTP-соединение на передачу данных от клиента
 							// к серверу (устанавливаем в true, т. к. мы хотим отправить данные вместе с запросом POST):
 							httpConnection.setDoOutput(true);
 							
-							String charset = "8859_1";
 							try (Formatter postData = new Formatter(httpConnection.getOutputStream(), charset)) {
 								// Формируем данные для отправки совместно с запросом POST:
-								String postStr = String.format("%s=%s&%s=%s&%s=%s", 
+								String postString = String.format("%s=%s&%s=%s&%s=%s", 
 										// Статический класс URLEncoder используется для преобразования 
 										// символьных данных в MIME-формат "application/x-www-form-urlencoded":
-										"first_name", URLEncoder.encode(firstNameField.getText(), charset),
-										"last_name", URLEncoder.encode(lastNameField.getText(), charset),
-										"password", URLEncoder.encode(new String (passwordField.getPassword()), charset) );
+										"first_name", URLEncoder.encode( firstNameField.getText(), charset ),
+										"last_name", URLEncoder.encode( lastNameField.getText(), charset ),
+										"password", URLEncoder.encode( new String (passwordField.getPassword()), charset ) );
+								postData.format("%s", postString);
 								
 								// Отправляем данные в выходной поток HTTP-соединения:
-								postData.format(postStr);
 								postData.flush();
 								
 								requestInfoArea.append("POST request data:\n");
-								requestInfoArea.append(postStr);
+								requestInfoArea.append(postString);
 							}
 							
 							// Выводим информацию по полученному ответу от сервера:
