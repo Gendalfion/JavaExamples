@@ -1,5 +1,9 @@
 @echo off
 
+rem ƒанный скрипт используетс€ во врем€ старта сервера Apache Tomcat
+rem ≈го задача состоит в установке переменных JAVA_HOME (JRE_HOME)
+rem на основе поиска пути установки исполн€емых файлов javac (java) в системе
+
 rem Trying to find JDK home directory:
 FOR /F "tokens=* USEBACKQ" %%F IN (`where javac`) DO (
     SET JAVA_HOME=%%F
