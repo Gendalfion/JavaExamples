@@ -9,4 +9,8 @@ rem -d <directory> Папка, куда будут скопированы .class-файлы, полученные при ко
 rem -p <package name> Явным образом указывает корневой пакет для сгенерированных классов
 rem В качестве исходного файла берется WSDL-файл с описанием интерфейса для веб сервиса
 
+PUSHD .\..\..
+
 wsimport -s ./src -d ./bin -verbose -p java_api_testing.net_api.ws_testing.generated http://www.webservicex.net/BibleWebservice.asmx?WSDL
+
+POPD

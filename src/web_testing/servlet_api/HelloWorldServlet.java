@@ -1,6 +1,9 @@
 package web_testing.servlet_api;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -57,10 +60,32 @@ public class HelloWorldServlet extends HttpServlet {
 		
 		// ”станавливаем MIME-тип отправл€емых клиенту данных:
 		response.setContentType("text/html");
+		response.setCharacterEncoding("utf-8");
 		
 		// ¬ыводим данные в ответный поток response: 
-		response.getWriter().println(
+		try ( PrintWriter out = response.getWriter() ) {
+			out.println(
 				"<html><head><title>Hello, client!</title></head>" +
-				"<body><h1>I am Hello World Servlet!</h1></body></html>");
+				"<body><h1>I am Hello World Servlet!</h1>");
+			
+			// ћетод HttpServlet.getInitParameterNames() используетс€ дл€ доступа к параметрам, переданным данной копии сервлета
+			// ѕараметры устанавливаютс€ в конфигурационных файлах веб-приложени€ (например, web.xml)
+			if ( getInitParameterNames().hasMoreElements() ) {
+				out.println("<hr><h3>Initialization parameters sent to this servlet:</h3>");
+				out.println( "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"4\">" );
+				
+				// ¬ыводим все параметры, переданные сервлету, в виде таблицы:
+				Enumeration<String> param_names = getInitParameterNames();
+				while (param_names.hasMoreElements()) {
+					String name = (String) param_names.nextElement();
+					
+					out.println( "<tr><td align=\"left\" width=\"200\">" + name + "</td>"
+	                		+ "<td align=\"left\">" + getInitParameter(name) + "</td></tr>");
+				}
+				out.println( "</table>" );
+			}
+			
+			out.println("</body></html>");
+		}
 	}
 }

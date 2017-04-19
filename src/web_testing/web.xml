@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<!--
+  Данный файл содержит настройки для веб-приложения MyStudy
+  Описание структуры файла можно найти в спецификации Java™ Servlet Specification (раздел Deployment Descriptor)
+--><web-app 
+	version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+	
+	<!-- Создаем сервлет hello_servlet_1 из класса HelloWorldServlet и передаем ему 2 инициализационных параметра: -->
+	<servlet>
+		<servlet-name>hello_servlet_1</servlet-name>
+		<servlet-class>web_testing.servlet_api.HelloWorldServlet</servlet-class>
+		<init-param>
+			<param-name>Some Param 1</param-name>
+			<param-value>Значение параметра 1</param-value>
+		</init-param>
+		<init-param>
+			<param-name>Some Param 2</param-name>
+			<param-value>Значение параметра 2</param-value>
+		</init-param>
+	</servlet>
+	<!-- Привязываем сервлет hello_servlet_1 к URL-шаблону /hello1 
+		 Если конфигурация сервлета, определенная аннотациями в классе HelloWorldServlet
+		 будет конфликтовать с конфигурацией в web.xml, то сервер использует конфигурацию из web.xml -->
+	<servlet-mapping>
+		<servlet-name>hello_servlet_1</servlet-name>
+		<url-pattern>/hello1</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Создаем еще одну копию сервлета HelloWorldServlet со своим параметром инициализации: -->
+	<servlet>
+		<servlet-name>hello_servlet_2</servlet-name>
+		<servlet-class>web_testing.servlet_api.HelloWorldServlet</servlet-class>
+		<init-param>
+			<param-name>Some Param 3</param-name>
+			<param-value>Значение параметра 3</param-value>
+		</init-param>
+	</servlet>
+	<!-- Привязываем сервлет hello_servlet_2 к URL-шаблону /hello2 -->
+	<servlet-mapping>
+		<servlet-name>hello_servlet_2</servlet-name>
+		<url-pattern>/hello2</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Определяем список индексных страниц для веб-приложения: -->
+	<welcome-file-list>
+		<!-- Данные страницы будут доступны по URL-шаблону "\*" -->
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.htm</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <!-- Определяем сервлет, который мы будем использовать для обработки ошибок: -->
+    <servlet>
+		<servlet-name>error_handle_servlet</servlet-name>
+		<servlet-class>web_testing.servlet_api.ErrorHandleServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>error_handle_servlet</servlet-name>
+		<url-pattern>/error_handler</url-pattern>
+	</servlet-mapping>
+    <!-- Мы можем задавать обработчики для каждых кодов ошибок по отдельности: -->
+    <error-page>
+    	<error-code>404</error-code>
+    	<!-- В поле location мы должны указать путь к ресурсу-обработчику ошибки -->
+    	<location>/error_handler</location>
+    </error-page>
+    <error-page>
+    	<error-code>403</error-code>
+    	<location>/error_handler</location>
+    </error-page>
+    <!-- Мы можем задавать обработчики для определенных типов исключений: -->
+    <error-page>
+    	<exception-type>java.lang.IOException</exception-type>
+    	<location>/error_handler</location>
+    </error-page>
+    <!-- Мы можем определить обработчик для всех возможных типов и кодов ошибок: -->
+    <error-page>
+    	<location>/error_handler</location>
+    </error-page>
+	
+	<!-- Объявляем роли пользователей в системе (сами пользователи регистрируются в файле ${CATALINA_BASE}\conf\tomcat-users.xml): -->
+	<security-role>
+		<role-name>secretagent</role-name>
+	</security-role>
+	<!-- Определяем ресурсы с ограничениями по доступу: -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Секретные документы (только для секретных агентов!)</web-resource-name>
+			<!-- Определяем список URL-шаблонов, которые будут с ограничениями по доступу: -->
+			<url-pattern>/secret/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<!-- Определяем роли пользователей, которые будут иметь доступ к ограниченному ресурсу: -->
+			<role-name>secretagent</role-name>
+		</auth-constraint>
+		<!-- Мы можем определить уровень защищенности передачи данных:
+			NONE 		 - никакой защиты передачи нет (все данные передаются в текстовом виде, сертификатов нет) (протокол HTTP)
+			INTEGRAL 	 - данные открыты, но имеется защита целостности при помощи цифровых сертификатов (протокол HTTPS)
+			CONFIDENTIAL - то же, что и INTEGRAL, но данные дополнительно шифруются (протокол HTTPS)
+			<user-data-constraint>
+				<transport-guarantee>{NONE | INTEGRAL | CONFIDENTIAL}</transport-guarantee>
+			</user-data-constraint>
+		-->
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Прямой доступ к ресурсу ограничен для всех пользователей</web-resource-name>
+			<!-- Мы ограничиваем прямой доступ к форме аутентификации,
+				 чтобы клиент не мог напрямую перейти на форму (форма должна вызываться контейнером
+				 сервлетов автоматически при попытке доступа к защищенному ресурсу): -->
+			<url-pattern>/secret/login</url-pattern>
+		</web-resource-collection>
+		<!-- Пустой список ролей, имеющих доступ к ресурсу, полностью ограничивает доступ для всех пользователей: -->
+		<auth-constraint>
+		</auth-constraint>
+	</security-constraint>
+	<!-- Определяем метод аутентификации пользователей для доступа к ресурсам с ограничениями: -->
+	<login-config>
+		<!-- Метод BASIC определяет ввод логина/пароля при помощи встроенного окошка в браузере.
+			 Отрицательной стороной данного метода является невозможность отмены аутентификации путем программного закрытия сессии
+			 (например при нажатии пользователем кнопки logout, контейнер сервлета создает новую сессию) -->
+		<!-- <auth-method>BASIC</auth-method> -->
+		
+		<!-- Метод FORM определят собственную форму для ввода логина/пароля (в виде html/jsp-страницы или сервлета) -->
+		<auth-method>FORM</auth-method>
+		<form-login-config>
+			<!-- Используем сервлет /secret/login в качестве формы для аутентификации: -->
+			<form-login-page>/secret/login</form-login-page>
+			<!-- form-error-page задает страницу, которая будет вызвана при неудачной аутентификации пользователя: -->
+			<form-error-page>/secret/login?login_failed</form-error-page>
+		</form-login-config>
+	</login-config>
+</web-app>

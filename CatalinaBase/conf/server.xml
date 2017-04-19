@@ -149,7 +149,10 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
 
-      <Context docBase="${catalina.home}/webapps/examples" path="" reloadable="true"/></Host>
+        <Context docBase="${catalina.home}/webapps/examples" path="/examples" reloadable="true"/>
+
+        <Context docBase="${catalina.home}/webapps/docs" path="/docs" reloadable="true"/>
+      </Host>
     </Engine>
   </Service>
 </Server>
