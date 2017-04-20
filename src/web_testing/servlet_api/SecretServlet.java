@@ -16,7 +16,9 @@ import javax.servlet.http.HttpSession;
 /**
  * Демонстрация сервлета, имеющего ограничения по доступу
  */
-@WebServlet( urlPatterns = { "/secure" } )
+@WebServlet( 
+		name = "SecretServlet",
+		urlPatterns = { "/secure" } )
 // Ограничение доступа может быть установлено при помощи аннотации ServletSecurity:
 @ServletSecurity ( 
 		// Определяем роли пользователей, имеющих доступ к сервлету:

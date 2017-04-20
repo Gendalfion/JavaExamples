@@ -3,6 +3,7 @@ package web_testing.servlet_api;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -48,7 +49,9 @@ import javax.servlet.http.HttpServletResponse;
  * 	Ќажать кнопку Attach Source... и указать путь к архиву apache-tomcat-9.0.0.M19-src.zip<br>
  * 	(расположен в корневой папке проекта MyStudy)
  */
-@WebServlet("/hello") // ќбъ€вл€ем сервлет при помощи аннотации @WebServlet с указанием шаблона URL дл€ доступа к сервлету
+@WebServlet(urlPatterns = {"/hello"}, 	// ќбъ€вл€ем сервлет при помощи аннотации @WebServlet с указанием шаблона(ов) URL дл€ доступа к сервлету
+			name = "HelloWorldServlet" )// ќбъ€вл€ем название-псевдоним сервлета дл€ того, чтобы на него можно было ссылатьс€ в других 
+										// аннотаци€х или дескрипторе веб-приложени€ 
 public class HelloWorldServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
@@ -65,13 +68,13 @@ public class HelloWorldServlet extends HttpServlet {
 		// ¬ыводим данные в ответный поток response: 
 		try ( PrintWriter out = response.getWriter() ) {
 			out.println(
-				"<html><head><title>Hello, client!</title></head>" +
-				"<body><h1>I am Hello World Servlet!</h1>");
+				"<html><head><title>ѕривет, клиент!</title></head>" +
+				"<body><h1>ѕриветсвие от сервлета HelloWorldServlet!</h1>");
 			
-			// ћетод HttpServlet.getInitParameterNames() используетс€ дл€ доступа к параметрам, переданным данной копии сервлета
+			// ћетод HttpServlet.getInitParameterNames() используетс€ дл€ доступа к параметрам инициализации, переданным данной копии сервлета
 			// ѕараметры устанавливаютс€ в конфигурационных файлах веб-приложени€ (например, web.xml)
 			if ( getInitParameterNames().hasMoreElements() ) {
-				out.println("<hr><h3>Initialization parameters sent to this servlet:</h3>");
+				out.println("<hr><h3>»нициализационные параметры, переданные сервлету:</h3>");
 				out.println( "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"4\">" );
 				
 				// ¬ыводим все параметры, переданные сервлету, в виде таблицы:
@@ -81,6 +84,21 @@ public class HelloWorldServlet extends HttpServlet {
 					
 					out.println( "<tr><td align=\"left\" width=\"200\">" + name + "</td>"
 	                		+ "<td align=\"left\">" + getInitParameter(name) + "</td></tr>");
+				}
+				out.println( "</table>" );
+			}
+			
+			// ѕараметры запроса, переданные в GET/POST запросах, 
+			// доступны в виде отображени€ HttpServletRequest.getParameterMap():
+			Map<String, String[]> requestParamMap = request.getParameterMap();
+			if ( !requestParamMap.isEmpty() ) {
+				out.println("<hr><h3>ѕараметры запроса к сервлету:</h3>");
+				out.println( "<table border=\"0\" cellspacing=\"5\">" );
+				
+				// ¬ыводим все параметры запроса в виде таблицы:
+				for ( String param_name : requestParamMap.keySet() ) {
+					out.println( "<tr><td align=\"left\" width=\"200\">" + param_name + "</td>"
+	                		+ "<td align=\"left\">" + request.getParameter(param_name) + "</td></tr>");
 				}
 				out.println( "</table>" );
 			}

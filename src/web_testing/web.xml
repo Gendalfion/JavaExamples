@@ -133,4 +133,22 @@
 			<form-error-page>/secret/login?login_failed</form-error-page>
 		</form-login-config>
 	</login-config>
+	
+	<!-- Определяем фильтр, обрабатывающий запросы и ответы к компонентам веб-приложения: -->
+	<filter>
+		<!-- Называем фильтр также, как мы его назвали в аннотации к классу фильтра,
+			 это позволит нам переопределить фильтр, объявленный в аннотации к классу: -->
+		<filter-name>testing_filter</filter-name>
+		<filter-class>web_testing.servlet_api.FilterTesting</filter-class>
+		<!-- Мы можем задавать параметры инициализации для фильтра: -->
+		<init-param>
+			<param-name>init_param</param-name>
+			<param-value>Init from web.xml</param-value>
+		</init-param>
+	</filter>
+	<!-- Привязываем фильтр к URL-шаблону: -->
+	<filter-mapping>
+		<filter-name>testing_filter</filter-name>
+		<url-pattern>/*</url-pattern> <!-- Привязываем фильтр ко всему множеству адресов веб-приложения -->
+	</filter-mapping>
 </web-app>
