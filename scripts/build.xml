@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<!-- Данный файл является скриптом для сборки проекта MyStudy при помощи утилиты Apache Ant 	-->
+<!-- Для сборки при помощи ant необходимо: 														-->
+<!-- 	* Распаковать в любое место архив thirdparty/apache-ant-1.10.1-bin.zip 					-->
+<!--  	* Для удобства путь к папке {ant-location}/bin/ можно пробить в перменной среды PATH 	-->
+<!--  	* Также необходимо убедиться, что путь к {JDK}/bin присутствует в перменной среды PATH 	-->
+<!-- 	* Перейти в директорию {project_dir}/scripts 											-->
+<!-- 	* Набрать в командной строке: ant (запустится задача по-умолчанию: build_all)			-->
+<!-- 	* Для запуска определенной задачи (clean, compile, make_war): ant {имя_задачи} 			-->
+<project name="MyStudyAnt" basedir="../." default="build_all">
+	<!-- Перечисляем свойства, на которые мы можем ссылаться далее в скрипте при помощи конструкции ${...}: -->
+	
+	<!-- Каталог с исходными кодами проекта (*.java - файлами) -->
+	<property name="src_dir" 		value="src"/>
+	<!-- Каталог, в который будут скопированы *.class-файлы после компиляции при помощи javac -->
+	<property name="build_dir" 		value="bin_ant"/>
+	<!-- Базовый каталог сервера Apache Tomcat -->
+	<property name="catalina_base" 	value="CatalinaBase"/>
+	<!-- Файл дескриптора веб-приложения MyStudy -->
+	<property name="web_xml" 		value="src/web_testing/web.xml"/>
+	<!-- Путь, по которому будет размещен .war-архив для развертывания на веб-сервере -->
+	<property name="war_file" 		value="${catalina_base}/webapps/${ant.project.name}.war"/>
+	<!-- Вспомогательная директория -->
+	<property name="tmp_dir" 		value="./tmp"/>
+	<!-- Папка с классами (сервлетами, фильтрами и т. п.) веб-приложения MyStudy -->
+	<property name="webapp_dir" 	value="web_testing"/>
+	
+	<!-- Указываем дополнительные библиотеки, используемые при компиляции проекта: -->
+	<path id="classpath">
+        <fileset dir="WebContent/WEB-INF/lib" includes="**/*.jar"/>
+    </path>
+	
+	<!-- Перечисляем задачи для утилиты ant 			
+	 	(каждая задача - это микропрограмма, 
+		состоящая из определенного набора действий: -->
+	<target name="clean" depends="">
+		<!-- Очищаем все результаты сборки: -->
+		<delete dir="${build_dir}"/>
+		<delete file="${war_file}"/>
+		<delete dir="${tmp_dir}"/>
+	</target>
+	
+	<target name="compile" depends="clean">
+		<!-- Компилируем содержимое папки ${src_dir}: -->
+		<mkdir dir="${build_dir}"/>
+		<javac srcdir="${src_dir}" destdir="${build_dir}" classpathref="classpath"/>
+	</target>
+	
+	<target name="make_war" depends="">
+		<!-- Производим сборку war-архива с веб-приложением: -->
+		<copy todir="${tmp_dir}/classes/${webapp_dir}">
+    		<fileset dir="${build_dir}/${webapp_dir}"/>
+  		</copy>
+  		
+  		<copy todir="${tmp_dir}/misc">
+  			<fileset dir="${src_dir}">
+      			<include name="**/*.html"/>
+    		</fileset>
+  		</copy>
+  		
+		<war warfile="${war_file}" webxml="${web_xml}">
+			<classes dir="${tmp_dir}/classes"/>
+			<fileset dir="${tmp_dir}/misc"/>
+		</war>
+		
+		<delete dir="${tmp_dir}"/>
+	</target>
+	
+	<target name="build_all" depends="compile, make_war"/>
+</project>
