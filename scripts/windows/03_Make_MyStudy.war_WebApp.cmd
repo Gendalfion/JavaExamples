@@ -24,12 +24,17 @@ echo. & echo Using home dir for java-classes: %CLASSES_HOME%
 echo Using base dir for Tomcat Server: %CATALINA_BASE%
 
 echo. & echo Copying web-application files to temporary directory...
+rem Копируем файлы статических HTML-страниц:
 copy /A /Y "%CLASSES_HOME%\*.html" ".\tmp\*.html"
 xcopy "%CLASSES_HOME%\secret\*" ".\tmp\secret\*" /I /E
+rem Копируем class-файлы из пакета web_testing (сервлеты, обработчики событий, фильтры):
 echo .xml > .\tmp\exclude.txt
 xcopy "%CLASSES_HOME%\web_testing" ".\tmp\WEB-INF\classes\web_testing" /I /E /EXCLUDE:.\tmp\exclude.txt
+rem Копируем class-файлы из пакета java_api_testing.net_api.ws_testing (веб-сервисы):
+xcopy "%CLASSES_HOME%\java_api_testing\net_api\ws_testing\*.class" ".\tmp\WEB-INF\classes\java_api_testing\net_api\ws_testing" /I
 erase /Q .\tmp\exclude.txt
-xcopy "%CLASSES_HOME%\web_testing\web.xml" ".\tmp\WEB-INF\" /I
+rem Копируем дескрипторные файлы для веб-приложения (web.xml, sun-jaxws.xml):
+xcopy "%CLASSES_HOME%\web_testing\*.xml" ".\tmp\WEB-INF\" /I
 
 echo. & echo Creating .war-archive from temporary directory content...
 jar -cvf %CATALINA_BASE%\webapps\MyStudy.war -C tmp\ .

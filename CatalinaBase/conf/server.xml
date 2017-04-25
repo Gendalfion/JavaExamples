@@ -151,8 +151,7 @@
 
         <Context docBase="${catalina.home}/webapps/examples" path="/examples" reloadable="true"/>
 
-        <Context docBase="${catalina.home}/webapps/docs" path="/docs" reloadable="true"/>
-      </Host>
+        <Context docBase="${catalina.home}/webapps/docs" path="/docs" reloadable="true"/>      </Host>
     </Engine>
   </Service>
 </Server>

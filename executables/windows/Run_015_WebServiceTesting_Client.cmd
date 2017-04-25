@@ -1,0 +1,1 @@
+start javaw -cp ..\..\.\bin java_api_testing.net_api.ws_testing.JAXWS_WebServiceTesting_Client

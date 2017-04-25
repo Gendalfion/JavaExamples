@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+
+<!-- В данном файле содержатся объявления веб-сервисов, разворачиваемых в контексте текущего веб-приложения 
+     Данный файл должен быть расположен в папке ${WEB_APP}/WEB-INF/ для каждого веб-приложения, разворачиваемого на сервере-->
+<endpoints	
+	xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime"
+	version="2.0">
+	
+	<!-- Определяем интерфейсы веб-сервисов, публикуемых в контексте веб-приложения: -->
+	
+	<endpoint
+	    name="WebServiceTesting"
+	    implementation="java_api_testing.net_api.ws_testing.JAXWS_WebServiceTesting_Server"
+	    url-pattern="/ws_testing"
+	/>
+</endpoints>

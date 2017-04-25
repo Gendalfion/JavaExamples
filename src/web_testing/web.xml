@@ -3,6 +3,7 @@
 <!--
   Данный файл содержит настройки для веб-приложения MyStudy
   Описание структуры файла можно найти в спецификации Java™ Servlet Specification (раздел Deployment Descriptor)
+  Данный файл должен находиться в папке ${WEB_APP}/WEB-INF/ для каждого веб-приложения, разворачиваемого на сервере
 --><web-app 
 	version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -81,7 +82,7 @@
     	<location>/error_handler</location>
     </error-page>
 	
-	<!-- Объявляем роли пользователей в системе (сами пользователи регистрируются в файле ${CATALINA_BASE}\conf\tomcat-users.xml): -->
+	<!-- Объявляем роли пользователей в системе (сами пользователи регистрируются в файле ${CATALINA_BASE}/conf/tomcat-users.xml): -->
 	<security-role>
 		<role-name>secretagent</role-name>
 	</security-role>
@@ -151,4 +152,31 @@
 		<filter-name>testing_filter</filter-name>
 		<url-pattern>/*</url-pattern> <!-- Привязываем фильтр ко всему множеству адресов веб-приложения -->
 	</filter-mapping>
+	
+	<!-- Делаем настройки, которые позволят нам развернуть веб-сервисы на сервере: -->
+	<listener>
+		<!-- Регистрируем обработчик событий JAX-WS: -->
+		<!-- 
+			* Примечание: Сервера (такие как Apache Tomcat) в своей стандартной поставке не
+			содержат библиотек по разворачиванию веб-сервисов. Поэтому, для запуска веб-сервисов 
+			внутри сервера, необходимо включить в classpath библиотеки JAX-WS RI (например, скопировав 
+			все необходимые *.jar-файлы в каталог ${CATALINA_BASE}/lib)
+		-->
+		<listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+   	</listener>
+   	<!-- Регистрируем сервлет JAX-WS для работы с веб сервисами: -->
+ 	<servlet>
+   		<servlet-name>web_service_servlet</servlet-name>
+   		<servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+   		<load-on-startup>1</load-on-startup>
+ 	</servlet>
+ 	<servlet-mapping>
+   		<servlet-name>web_service_servlet</servlet-name>
+   		<!-- Шаблоны URL-адресов для доступа к веб-сервисам должны совпадать
+   		     с шаблонами в объявлении веб-сервисов в файле ${WEB_APP}/WEB-INF/sun-jaxws.xml  -->
+   		<url-pattern>/ws_testing</url-pattern>
+ 	</servlet-mapping>
+ 	<session-config>
+   		<session-timeout>60</session-timeout>
+ 	</session-config>
 </web-app>

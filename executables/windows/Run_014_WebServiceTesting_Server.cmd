@@ -1,0 +1,1 @@
+start java -cp ..\..\.\bin java_api_testing.net_api.ws_testing.JAXWS_WebServiceTesting_Server "http://0.0.0.0:8080/myservice"
