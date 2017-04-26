@@ -69,7 +69,7 @@ public class HelloWorldServlet extends HttpServlet {
 		try ( PrintWriter out = response.getWriter() ) {
 			out.println(
 				"<html><head><title>Привет, клиент!</title></head>" +
-				"<body><h1>Приветсвие от сервлета HelloWorldServlet!</h1>");
+				"<body><h1>Приветствие от сервлета HelloWorldServlet!</h1>");
 			
 			// Метод HttpServlet.getInitParameterNames() используется для доступа к параметрам инициализации, переданным данной копии сервлета
 			// Параметры устанавливаются в конфигурационных файлах веб-приложения (например, web.xml)
