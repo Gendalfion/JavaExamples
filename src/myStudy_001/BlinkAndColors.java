@@ -1,17 +1,7 @@
 package myStudy_001;
 
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.MouseInfo;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 public class BlinkAndColors {
@@ -23,14 +13,13 @@ public class BlinkAndColors {
 		myWnd.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myWnd.add( new BlinkAndColorsComponent("Текст, который можно перетаскивать (ПКМ)") );
 		myWnd.setVisible(true);
-		//System.out.println("Application ended!");
-		//System.exit(0);
 	}
 
 }
 
 class BlinkAndColorsComponent extends JComponent implements MouseMotionListener, ActionListener, Runnable {
-	
+	private static final long serialVersionUID = 1L;
+
 	private String mOutLabelText = "";
 	
 	private int mMousePosX = 100, mMousePosY = 100;
@@ -38,7 +27,6 @@ class BlinkAndColorsComponent extends JComponent implements MouseMotionListener,
 	private JButton myButton = null;
 	private Font mTextFont = new Font("", Font.BOLD, 16);
 	private boolean mTextBlinkState = true;
-	private Thread mTextBlinkerThread = null;
 	
 	private int mTextColorIndex = 0;
 	private final Color [] TEXT_COLORS = { Color.BLACK, Color.BLUE, Color.GREEN, Color.CYAN, Color.RED };
@@ -47,28 +35,14 @@ class BlinkAndColorsComponent extends JComponent implements MouseMotionListener,
 		mOutLabelText = text_str;
 		
 		this.addMouseMotionListener(this);
-		this.addMouseListener( new MouseListener() {
-			
+		this.addMouseListener( new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				mCurMouseBtnPressed = MouseEvent.NOBUTTON;
 			}
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				mCurMouseBtnPressed = arg0.getButton();
-			}
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
 		
@@ -77,8 +51,6 @@ class BlinkAndColorsComponent extends JComponent implements MouseMotionListener,
 		myButton.addActionListener(this);
 		this.add(myButton);
 		
-		//mTextBlinkerThread = new TextBlinker();
-		//mTextBlinkerThread.start();
 		new Thread(this).start();
 		
 		System.out.println("Конструктор класса BlinkAndColorsComponent...");
@@ -120,7 +92,6 @@ class BlinkAndColorsComponent extends JComponent implements MouseMotionListener,
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 		if ( arg0.getSource().equals(myButton))
 		{
 			NextColor();
@@ -130,33 +101,15 @@ class BlinkAndColorsComponent extends JComponent implements MouseMotionListener,
 		}
 	}
 	
-	class TextBlinker extends Thread {
-		@Override
-		public void run() {
-			while (! this.isInterrupted() )
-			{	
-				try {
-					sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				mTextBlinkState = !mTextBlinkState;
-				repaint();
-			}
-			
-			super.run();
-		}
-	}
-
 	@Override
 	public void run() {
 		try {
-		while ( true )
-		{	
-			Thread.sleep(500);
-			mTextBlinkState = !mTextBlinkState;
-			repaint();
-		}
+			while ( true )
+			{	
+				Thread.sleep(500);
+				mTextBlinkState = !mTextBlinkState;
+				repaint();
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
