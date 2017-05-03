@@ -43,7 +43,7 @@ public class ClippedDragImage extends DragImage
  	// По-умолчанию для компонентов swing двойная буферизация включена:
  	doubleBufferingEnabled.setSelected(true);
  	doubleBufferingEnabled.setHorizontalTextPosition(SwingConstants.LEADING);
- 	doubleBufferingEnabled.addActionListener(new ActionListener() {
+ 	doubleBufferingEnabled.addActionListener( new ActionListener() {
  		@Override public void actionPerformed(ActionEvent e) {
  			RepaintManager.currentManager(null).setDoubleBufferingEnabled(doubleBufferingEnabled.isSelected());
  		}

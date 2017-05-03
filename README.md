@@ -6,8 +6,11 @@
    2. Скачать IDE для написания и компиляции своих проектов (например, среда Eclipse):
       http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/neonr
       
-      Примечание: для запуска примеров из пакета web_testing.* понадобится среда с поддержкой Java EE:
+      Примечание 1: для запуска примеров из пакета web_testing.* понадобится среда с поддержкой Java EE:
       http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/neon3
+      
+      Примечание 2: примеры из пакета netbeans_testing.* созданы в среде NetBeans:
+      https://netbeans.org/downloads/index.html
       
    3. После установки JDK и IDE импортировать классы из примеров (File->Import) в свой Workspace
    
@@ -17,7 +20,9 @@
 
 \--                                      Корневая папка проекта
 
-\  \-- bin                               .class файлы для исполнения Java-машиной (результат компиляции .java файлов)
+\  \-- bin                               .class файлы для исполнения Java-машиной (результат компиляции .java файлов средой Eclipse)
+
+\  \-- build                             результаты компиляции и сборки проекта средой NetBeans
 
 \  \-- executables                       папка с командными файлами для запуска некоторых примеров (.java файлы должны быть скомпилированы)
 
@@ -28,5 +33,9 @@
 \  \-- scripts                           папка со скриптовыми командными файлами для сборки исполняемых файлов и приложений
 
 \  \-- CatalinaBase                      базовая директория для среды выполнения сервера Apache Tomcat (при ручном запуске сервера при помощи скриптов из папки executables)
+
+\  \-- .settings                         настройки проекта для IDE Eclipse
+
+\  \-- nbproject                         настройки проекта для IDE NetBeans
 
 \  \-- README.md                         Данный документ
