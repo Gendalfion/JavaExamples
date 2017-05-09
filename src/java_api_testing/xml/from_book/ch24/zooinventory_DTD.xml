@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xml>
-<!-- We define xmlns (XML namespace) in order to specify namespace of root element.
-	 xmlns - it is URI, uniquely identifying the element "inventory" from 
-	 similar elements in other namepaces.
-	 Also it identifies element definition in schema files (see zooinventory.xsd)  -->
-<inventory xmlns="https://www.zooinventory.com">
+<!-- We define validation rules by DTD scheme (see zooinventory.dtd): -->
+<!DOCTYPE inventory SYSTEM "zooinventory.dtd">
+<inventory>
 
 	<animal animalClass="mammal">
         <name>Song Fang</name>

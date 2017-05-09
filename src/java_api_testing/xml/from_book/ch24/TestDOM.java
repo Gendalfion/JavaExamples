@@ -17,7 +17,7 @@ public class TestDOM
 		// –езультатом парсинга XML-документа при помощи DOM API €вл€етс€ класс org.w3c.dom.Document:
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder parser = factory.newDocumentBuilder();
-		Document document = parser.parse( TestSAXModelBuilder.class.getResourceAsStream("zooinventory.xml") );
+		Document document = parser.parse( TestDOM.class.getResourceAsStream("zooinventory.xml") );
 
 		//  ласс Document представл€ет полное содержимое XML-документа (т. е. он полностью загружаетс€ в оп. пам€ть):
 		Element inventory = document.getDocumentElement();

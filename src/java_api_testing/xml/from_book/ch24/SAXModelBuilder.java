@@ -124,13 +124,12 @@ public class SAXModelBuilder extends DefaultHandler
      */
 	public Object getModel() { return stack.peek(); }
 	
-	private void println ( int space, String line ) {
-		String spaceFmt;  
-		if ( space > 0 ) {
-			spaceFmt = String.format("%1$d.%1$ds", space * 3); 
-		} else {
-			spaceFmt = "s";
-		}
-		System.out.println( String.format( "%" + spaceFmt + "%s", "", line) );
+	/**
+     * Печатает строку текста с заданным отступом в стандартный поток вывода
+     * @param space - размер отступа (каждая единица отступа равна 3-м пробелам)
+     * @param line - строка текста для вывода
+     */
+    private static void println ( int space, String line ) {
+		System.out.println( String.format( "%" + ( (space > 0)?(String.format("%1$d.%1$ds", space * 3)):("s") ) + "%s", "", line) );
 	}
 }

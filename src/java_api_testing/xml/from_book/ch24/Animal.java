@@ -1,6 +1,6 @@
 package java_api_testing.xml.from_book.ch24;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.*;
 
 /**
  * Вспомогательный класс, используемый в примерах работы с XML
@@ -12,8 +12,8 @@ public class Animal
 {
     public static enum AnimalClass { mammal, reptile, bird, fish, amphibian, invertebrate }
 
-    @XmlAttribute
-    //@XmlAttribute(name = "class")
+    @XmlAttribute // Помечаем поле "animalClass" в качестве атрибута для XML-элемента "animal" 
+    //@XmlAttribute(name = "class") // Меняем имя атрибута с "animalClass" на "name"
     public AnimalClass animalClass;
 
 	public String name, species, habitat, food, temperament;

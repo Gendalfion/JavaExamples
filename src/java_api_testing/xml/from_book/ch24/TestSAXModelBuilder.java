@@ -22,7 +22,7 @@ public class TestSAXModelBuilder
 		// выполнения путем анализа соответствующих настроек в Java):
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 
-        factory.setValidating( true ); // Use DTD if present
+        //factory.setValidating( true ); // Use DTD if present
 
         // Получаем SAX-парсер из фабрики:
 		SAXParser saxParser = factory.newSAXParser();

@@ -1,3 +1,4 @@
+<!-- Схема DTD содержит набор правил, которым должен соответствовать XML-документ данного типа (см. файл zooinventory_DTD.xml): -->
 <!ELEMENT inventory ( animal* )>
 <!ELEMENT animal ( name, species, habitat, (food | foodRecipe), temperament, weight )>
 <!ATTLIST animal animalClass ( unknown | mammal | reptile | bird | fish ) "unknown">

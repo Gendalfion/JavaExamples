@@ -1,12 +1,16 @@
-<?xml version='1.0'?>
+<?xml version='1.0' encoding="UTF-8"?>
+<!DOCTYPE xml>
 <chapter xmlns:xi="http://www.w3.org/2001/XInclude">
-<title>XML For Humans</title>
-
-Consider the following example:
-
-<example>
-	<xi:include parse="text" href="chapter.xml"/>
-</example>
+	<title>XML For Humans</title>
+	
+	Consider the following example:
+	
+	<example>
+		<!-- Including XML-file as a plain text (without parsing any tags inside it): -->
+		<xi:include parse="text" href="chapter.xml">
+			<xi:fallback>Error including file with XInclude...</xi:fallback>
+		</xi:include>
+	</example>
 
 </chapter>
 
