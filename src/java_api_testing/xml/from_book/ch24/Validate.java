@@ -14,7 +14,7 @@ public class Validate
 {
 	public static void main( String [] args ) throws Exception
 	{
-        String xmlFile = "zooinventory.xml";
+        String xmlFile = "zooinventory_NS.xml";
         if ( args.length >= 1 ) {
         	xmlFile = args[0];
         }

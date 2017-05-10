@@ -43,14 +43,14 @@ public class TestXPath {
 				"//@animalClass",					// Все атрибуты "animalClass" где-либо в документе
 				"//animal/*",						// Все дочерние элементы узлов "animal" где-либо в документе
 				"/inventory/animal/.",				// Текущий узел (все узлы внутри "animal" в корневом элементе "inventory")
-				"/inventory/animal/..",				// Родительский узел (все узлы в корневом элементе "inventory")
+				"/inventory/animal/..",				// На один узел вверх (родительский узел "inventory")
 				
 				// Использование предикатов:
 				"/inventory/animal[1]",				// Первый элемент из дочерних узлов "animal" в корневом элементе "inventory"
 				"//animal[@animalClass=\"mammal\"]",// Все узлы "animal" с значением атрибута "animalClass" = "mammal"
 				"//animal[name=\"Cocoa\"]",			// Все узлы "animal" с дочерним узлом "name", равным тексту "Cocoa"
 				"//animal[weight > 35]/name",		// Все узлы "name" внутри "animal", чей узел "weight" в виде числа больше 35
-				"//animal[weight>20 and weight<44]",// Все узлы "name" внутри "animal", чей узел "weight" больше 20 и меньше 44
+				"//animal[weight>20 and weight<44]",// Все узлы "animal", чей узел "weight" больше 20 и меньше 44
 				
 				// Использование функций:
 				"/inventory/comment()",					// Все коментарии корневого узла "inventory"

@@ -3,6 +3,8 @@ package java_api_testing.xml.from_book.ch24;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
+import java.io.OutputStream;
 import java.util.Arrays;
 
 /**
@@ -19,24 +21,26 @@ public class TestJAXBMarshall
 		Inventory inventory = new Inventory();
 		
         Animal firstAnimal = new Animal( Animal.AnimalClass.mammal, "Song Fang", "Giant Panda", "China", "Friendly", 33.0, "Bamboo" );
-        inventory.animal.add( firstAnimal );
+        
         FoodRecipe recipe = new FoodRecipe();
         recipe.name = "Gorilla Chow";
         recipe.ingredient.addAll( Arrays.asList( "fruit", "shoots", "leaves" ) );
-        
         Animal secondAnimal = new Animal( Animal.AnimalClass.mammal, "Cocoa", "Gorilla", "Ceneral Africa", "Know-it-all", 45.0, recipe );
+        
+        inventory.animal.add( firstAnimal );
 		inventory.animal.add( secondAnimal );
 
 		// ¬ыполн€ем преобразование модели данных из оперативной пам€ти в XML-документ:
-        marshall( inventory );
+        marshall( inventory, System.out );
 	}
 
 	/**
 	 * ѕроцедура, выполн€юща€ преобразование заданного объекта в его XML-представление средствами технологии JAXB
 	 * @param jaxbObject - произвольный объект, соответствующий спецификации JAXB дл€ выполнени€ преобразовани€
+	 * @param out - поток вывода, в который будет записан результат преобразовани€
 	 * @throws JAXBException
 	 */
-    public static void marshall( Object jaxbObject ) throws JAXBException
+    public static void marshall( Object jaxbObject, OutputStream out ) throws JAXBException
     {
     	// ћетод javax.xml.bind.JAXBContext.newInstance(...) выполн€ет регистрацию переданных ему классов
     	// в качестве контекста дл€ прив€зки XML-документа. ѕримечательно то, что
@@ -47,7 +51,7 @@ public class TestJAXBMarshall
         // ”станавливаем удобочитаемый вывод XML-документа:
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         
-        // √енерируем XML-документ на основе модели jaxbObject в стандартный поток вывода:
-        marshaller.marshal(jaxbObject, System.out);
+        // √енерируем XML-документ на основе модели jaxbObject в поток вывода:
+        marshaller.marshal(jaxbObject, out);
     }
 }

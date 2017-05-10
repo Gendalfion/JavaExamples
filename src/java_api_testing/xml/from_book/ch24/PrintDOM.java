@@ -27,7 +27,7 @@ public class PrintDOM {
 	public static void main( String [] args ) throws Exception 
 	{
 		// Создаем диалоговое окно выбора опций загрузки и верификации xml-документа:
-		JCheckBox validatingCB = new JCheckBox("DTD Validating");
+		JCheckBox validatingCB = new JCheckBox("DTD Validation");
 		
 		JRadioButton xml1RB = new JRadioButton("zooinventory.xml", true);	xml1RB.setActionCommand(xml1RB.getText());
 		JRadioButton xml2RB = new JRadioButton("zooinventory_DTD.xml"); 	xml2RB.setActionCommand(xml2RB.getText());

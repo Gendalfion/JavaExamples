@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
+<!-- Веб-браузеры способны выполнять XSL-преобразования на стороне клиента.
+	 Для этого мы должны указать ссылку на XSL-файл в следующем теге: -->
+<?xml-stylesheet type="text/xsl" href="zooinventory2.xsl"?>
+<!-- Мы можем открыть данный файл в браузере и увидеть HTML-страничку,
+     содержащую результаты XSL-преобразования (мы можем применять
+     разные файлы XSL, указывая соотвествующие URL в атрибуте href,
+     например: "zooinventory.xsl" или "zooinventory2.xsl") -->
 <inventory>
-	<!-- Simple XML file with Zoo Inventory content information -->
-
 	<animal animalClass="mammal">
         <name>Song Fang</name>
         <species>Giant Panda</species>

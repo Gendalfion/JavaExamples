@@ -90,6 +90,11 @@ public class SAXModelBuilder extends DefaultHandler
 	// Вспомогательная процедура присваивания значения (value) заданному полю (name) объекта (target):
     void setProperty( String name, Object target, Object value ) throws SAXException, IllegalAccessException, NoSuchFieldException
     {
+    	if ( "xmlns".equals(name) ) {
+    		// Пропускаем атрибут "xmlns", указывающий пространство имен текущего элемента:
+    		println( stack.size() + 1, "setProperty: Skipping \"xmlns\" attribute, value = \"" + value + "\"..." );
+    		return;
+    	}
     	println( stack.size() + 1, String.format("setProperty( %s.%s = \"%s\")", target.getClass().getSimpleName(), name, value.toString()) );
     	
         Field field = target.getClass().getField( name );

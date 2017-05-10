@@ -2,7 +2,7 @@
 
 // ”станавливаем параметры всего пакета дл€ маппинга при помощи технологии JAXB
 @javax.xml.bind.annotation.XmlSchema ( 
-	namespace = "https://www.zooinventory.com",	// Ќазвание пространства имен XML-документа (см. zooinventory.xml)
+	namespace = "https://www.zooinventory.com",	// Ќазвание пространства имен XML-документа (см. zooinventory_NS.xml)
 	elementFormDefault =  javax.xml.bind.annotation.XmlNsForm.QUALIFIED )
 
 package java_api_testing.xml.from_book.ch24;

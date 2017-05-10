@@ -14,7 +14,7 @@ public class TestJAXBUnmarshall
 {
 	public static void main( String [] args ) throws JAXBException
     {
-		String xmlFileName = "zooinventory.xml";
+		String xmlFileName = "zooinventory_NS.xml";
 		if ( args.length >= 1 ) {
 			xmlFileName = args[0];
 		}
