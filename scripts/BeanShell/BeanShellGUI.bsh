@@ -1,0 +1,33 @@
+// ћы можем создавать графические интерфейсы при помощи классов Swing (AWT):
+button = new JButton( "Press me" );
+
+/*
+// ћы можем создать графическое окошко в стандартном Java стиле...
+my_frame = new JFrame( "My Frame" );
+my_frame.getContentPane().add( button );
+my_frame.pack();
+my_frame.setVisible(true);
+my_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+my_frame.setLocationRelativeTo(null);
+*/
+
+// или воспользоватьс€ командой frame( <компонент, размещаемый внутри окна> ):
+my_frame = frame (button);
+my_frame.setLocationRelativeTo(null);
+
+// ќбрабатываем событие нажати€ кнопки:
+button.addActionListener ( new ActionListener () {
+		// ћы можем обработать событие стандартным Java-способом...
+		// void actionPerformed(ActionEvent e) { ... }
+		
+		// или мы можем перехватывать все неопределенные €вным способом методы
+		// при помощи метода invoke:
+		invoke( name, args ) { 
+			
+			argsStr = new StringBuilder ("[ ");                           
+			for ( Object arg : args ) { argsStr.append ( arg.getClass().getSimpleName() + " " ); } 
+			argsStr.append ( "]" );
+			
+			JOptionPane.showMessageDialog( my_frame, "Method: \"" + name + "\" invoked, args: " + argsStr );
+		}
+} );

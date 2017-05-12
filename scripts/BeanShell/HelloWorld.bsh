@@ -1,0 +1,60 @@
+// BeanShell - это скриптовый язык на основе операторов и выражений Java.
+// Документация по BeanShell: http://www.beanshell.org/manual/bshmanual.html
+
+// В отличии от Java, BeanShell допускает неструктурированные 
+// выражения вне классов и методов:
+print("Hello, World!"); // Печатаем строку
+
+// В BeanShell также отсутствует строгая типизация:
+four = (2 + 2) * 2 / 2;
+str = "This is 7(number)3(text): ";
+print( "\n" + str + (four + 3) + 3 );
+
+// Мы можем объявлять методы вне классов:
+void printMap ( Map map_to_print ) { // Все базовые классы Java API (такие как Map, List, swing-компоненты и т. п.) уже ипортированы в наш код
+	print("\nPrinting map content:");
+	for ( Map.Entry elem : map_to_print.entrySet() ) {
+		key 	= elem.getKey();
+		value 	= elem.getValue();
+		// Для работы со списками переменной длины мы используем форму Object [] args:
+		print ( String.format( "%20.20s: %s", new Object [] {key, value} ) );
+	}
+}
+
+Map map = new HashMap();
+importObject (map); // Функция importObject может импортировать объекты в текущий контекст
+put ( "Key1", "Value1" ); 			// эквивалентно map.put ( "Key1", "Value1" );
+put ( "OtherKey", "OtherValue" ); 	// эквивалентно map.put ( "OtherKey", "OtherValue" );
+printMap (map); // Вызываем ранее объявленную функцию
+
+// Команды BeanShell вызываются как статические методы в текущем контексте:
+
+print("\npwd():");
+pwd(); // Печатает текущую директорию
+
+print("\ncd(\"..\"):");
+cd(".."); // Переход по относительному пути
+pwd();
+
+// Выводим путь к исходнику текущего скрипта:
+print ("\ngetSourceFileInfo(): " + getSourceFileInfo());
+
+// Получаем объект java.io.File по заданному пути:
+File sourceFile = pathToFile( getSourceFileInfo() );
+print( "Source file directory: " + dirname( sourceFile.getAbsolutePath() ) ); // dirname(...) выделяет имя каталога из заданного пути
+print( "Source file name: " + sourceFile.getName()  );
+
+// Мы можем объявляеть объекты подобно синтаксису JavaScript:
+MyObject( name ) {
+	mName = name;
+	// Мы можем объявлять вложенные методы внутри других методов:
+	String greet () {
+		return "I am MyObject, my name is \"" + mName + "\"";
+	}
+	return this; // Возвращаем содержимое данного метода
+}
+// Присваиваем содержимое метода MyObject переменной obj:
+obj = MyObject ("Foo");
+// Теперь мы можем получить доступ к содержимому MyObject:
+print ( "\nobj.mName = " + obj.mName );
+print ( "obj.greet(): " + obj.greet() );
